@@ -6,11 +6,15 @@ markdown note management helper
 
 note: `nom` is written for python 3.
 
-```
-git clone https://github.com/frnsys/nom.git
-cd nom
-pip install .
-```
+install with either:
+
+    pip install nom
+
+or from source:
+
+    git clone https://github.com/frnsys/nom.git
+    cd nom
+    pip install --editable .
 
 If you wish to use `nomadic clip` (to convert clipboard HTML into markdown notes) on OSX, you also need the following:
 
