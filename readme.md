@@ -16,7 +16,7 @@ or from source:
     cd nom
     pip install --editable .
 
-If you wish to use `nomadic clip` (to convert clipboard HTML into markdown notes) on OSX, you also need the following:
+If you wish to use `nom clip` (to convert clipboard HTML into markdown notes) on OSX, you also need the following:
 
     pip install pyobjc
 
