@@ -37,6 +37,7 @@ Options:
 Commands:
   clip    convert html in the clipboard to markdown
   export  export a note to html
+  preach  export a note to an html presentation
   view    view a note in the browse
 ```
 
@@ -47,8 +48,10 @@ A bit more about each command:
     - pass `-e` to open the resulting markdown file in `EDITOR`. only available if `-s` is specified
     - pass `-v` to compile and then view the note in your browser
     - pass `-o` to overwrite an existing note, if there is one
+- `view`: compiles and opens a note in the browser
+    - pass `-w` to continually watch the original markdown file and its assets and recompile on changes
 - `export`: to export a markdown file with its assets as a self-contained site, run `nom export ~/notes/foo.md .`. This will create a folder `foo` with the compiled note and its assets.
     - pass `-w` to continually watch the original markdown file and its assets and recompile on changes
     - pass `-v` to view the compiled note in your browser
-- `view`: compiles and opens a note in the browser
-    - pass `-w` to continually watch the original markdown file and its assets and recompile on changes
+    - pass `-s` with a path to a stylesheet to apply style overrides
+- `preach`: similar to `export`, except it creates an HTML slideshow, interpreting `---` as slide breaks. Slides are advanced using the arrow keys. Accepts the same options as `export`.

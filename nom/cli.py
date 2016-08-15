@@ -10,9 +10,12 @@ def cli():
     pass
 
 
-def compile_note(note, outdir, watch=False, view=False):
+def compile_note(note, outdir, watch=False, view=False, style=None, templ='default'):
     note = util.abs_path(note)
-    f = partial(compile.compile_note, outdir=outdir)
+    f = partial(compile.compile_note,
+                outdir=outdir,
+                templ=templ,
+                stylesheet=style)
     outpath = f(note)
     if view:
         click.launch(outpath)
@@ -33,9 +36,21 @@ def view(note, watch):
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
-def export(note, outdir, watch, view):
+@click.option('-s', '--style', help='stylesheet to use', default=None)
+def export(note, outdir, watch, view, style):
     """export a note to html"""
-    compile_note(note, outdir, watch=watch, view=view)
+    compile_note(note, outdir, watch=watch, view=view, style=style)
+
+
+@cli.command()
+@click.argument('note')
+@click.argument('outdir')
+@click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
+@click.option('-v', '--view', is_flag=True, help='view the note in the browser')
+@click.option('-s', '--style', help='stylesheet to use', default=None)
+def preach(note, outdir, watch, view, style):
+    """export a note to an html presentation"""
+    compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach')
 
 
 @cli.command()
