@@ -118,7 +118,8 @@ def _is_remote_image_link(link):
                 return True, ext
         except (KeyError,
                 requests.exceptions.ConnectionError,
-                requests.exceptions.ConnectTimeout):
+                requests.exceptions.ConnectTimeout,
+                requests.exceptions.ReadTimeout):
             pass
 
     return False, None
