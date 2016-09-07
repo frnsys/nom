@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='nom',
-    version='1.1.1',
+    version='1.1.2',
     description='tool for managing markdown notes',
     url='https://github.com/frnsys/nom',
     author='Francis Tseng',
