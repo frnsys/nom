@@ -10,12 +10,13 @@ def cli():
     pass
 
 
-def compile_note(note, outdir, watch=False, view=False, style=None, templ='default'):
+def compile_note(note, outdir, watch=False, view=False, style=None, templ='default', ignore_missing=False):
     note = util.abs_path(note)
     f = partial(compile.compile_note,
                 outdir=outdir,
                 templ=templ,
-                stylesheet=style)
+                stylesheet=style,
+                ignore_missing=ignore_missing)
     outpath = f(note)
     if view:
         click.launch(outpath)
@@ -26,9 +27,10 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
 @cli.command()
 @click.argument('note')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
-def view(note, watch):
+@click.option('-i', '--ignore', is_flag=True, help='ignore missing assets')
+def view(note, watch, ignore):
     """view a note in the browser"""
-    compile_note(note, '/tmp', view=True, watch=watch)
+    compile_note(note, '/tmp', view=True, watch=watch, ignore_missing=ignore)
 
 
 @cli.command()

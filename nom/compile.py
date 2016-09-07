@@ -10,7 +10,7 @@ env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
 
-def compile_note(note, outdir, stylesheet=None, templ='default'):
+def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False):
     title, _ = os.path.basename(note).rsplit('.', 1)
     content = open(note, 'r').read()
     templ = env.get_template('{}.html'.format(templ))
@@ -35,11 +35,16 @@ def compile_note(note, outdir, stylesheet=None, templ='default'):
         _, img_name = os.path.split(img_path)
         to_img_path = os.path.join(assetsdir, img_name)
         from_img_path = os.path.join(os.path.dirname(note), img_path)
-        shutil.copy(from_img_path, to_img_path)
+        try:
+            shutil.copy(from_img_path, to_img_path)
 
-        # update references to that image in the note
-        to_img_path_rel = os.path.relpath(to_img_path, outdir)
-        content = content.replace(img_path, to_img_path_rel)
+            # update references to that image in the note
+            to_img_path_rel = os.path.relpath(to_img_path, outdir)
+            content = content.replace(img_path, to_img_path_rel)
+        except FileNotFoundError:
+            if not ignore_missing:
+                raise
+            print('Couldn\'t find `{}`, ignoring'.format(from_img_path))
 
     # default styles
     styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
