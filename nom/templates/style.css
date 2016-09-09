@@ -1,93 +1,125 @@
+@import 'https://fonts.googleapis.com/css?family=Libre+Franklin:400,400i,700,700i';
+
 html, body {
-    padding: 0 1em;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+  padding: 0 1em;
+  font-family: "Libre Franklin", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
 img {
-    max-width: 100%;
-    margin: 0 auto;
-    display: block;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
 }
 a, a:visited {
-    color: #8765FB;
+  color: #8765FB;
 }
 .slide {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    visibility: hidden;
-    padding: 2em;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  visibility: hidden;
+  padding: 2em;
 }
 .slide:first-child {
-    visibility: visible;
+  visibility: visible;
+}
+.slide > h1:first-child,
+.slide > h2:first-child,
+.slide > h3:first-child {
+  margin-top: 0;
 }
 
 .vcenter {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 blockquote {
-    margin: 0;
-    padding: 0 2em;
-    border-left: 6px solid #8765FB;
-    color: #5D5D5D;
+  margin: 0;
+  padding: 0 2em;
+  border-left: 6px solid #8765FB;
+  color: #5D5D5D;
 }
 mark {
-    background: #95FF8E;
+  background: #95FF8E;
 }
 pre {
-    color: #8765FB;
-    padding: 2em;
-    font-size: 1.2em;
-    background: #F5F5F5;
+  color: #8765FB;
+  padding: 2em;
+  font-size: 1.2em;
+  background: #F5F5F5;
+  overflow-x: scroll;
 }
 hr {
-    margin: 3em 0;
-    height: 2px;
-    background: #eaeaea;
-    border: none;
+  margin: 3em 0;
+  height: 2px;
+  background: #eaeaea;
+  border: none;
 }
 .note {
-    max-width: 960px;
+  max-width: 960px;
 }
 iframe {
-    display: block;
-    margin: 0 auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .background {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    z-index: -1;
-    background-size: cover;
-    background-position: center center;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center center;
 }
 
 .background-caption {
-    position: absolute;
-    bottom: 1em;
-    color: #000;
-    background: #fff;
+  position: absolute;
+  bottom: 1em;
+  color: #000;
+  background: #fff;
+  max-width: 50%;
+  left: 1em;
+}
+
+.background-attribution {
+  position: absolute;
+  bottom: 0.5em;
+  right: 0.5em;
+  color: #777;
+  background: #fff;
+  max-width: 50%;
+  font-size: 0.5em;
+}
+
+.background-video {
+  position: fixed;
+  top: 50%; left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: -1;
 }
 
 figcaption {
-    text-align: center;
-    color: rgba(0,0,0,0.5);
+  text-align: center;
+  color: rgba(0,0,0,0.5);
 }
 
 .has-text::after {
-    content: "";
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
 }
 
 
