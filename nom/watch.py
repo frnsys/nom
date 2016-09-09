@@ -10,15 +10,18 @@ def watch_note(note, handle_func):
     call `handle_func` on change"""
     ob = Observer()
     handler = FileSystemEventHandler()
+    note_filename = path.basename(note)
 
     def handle_event(event):
         _, filename = path.split(event.src_path)
-        if note.filename == filename or \
+        if note_filename == filename or \
                 path.normpath(event.src_path) == path.normpath(util.assets_dir(note)):
+            print('compiling...')
             handle_func(note)
+            print('done')
     handler.on_any_event = handle_event
 
-    print('Watching {0}...'.format(util.get_title(note)))
+    print('watching "{0}"...'.format(note_filename))
     ob.schedule(handler, path.dirname(note), recursive=True)
     ob.start()
 
@@ -26,6 +29,6 @@ def watch_note(note, handle_func):
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print('Stopping...')
+        print('stopping...')
         ob.stop()
     ob.join()
