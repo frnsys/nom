@@ -33,13 +33,24 @@ class PDFPattern(ImagePattern):
         return fig
 
 
+class VideoPattern(ImagePattern):
+    def handleMatch(self, m):
+        src = m.group(3)
+        obj = etree.Element('video')
+        obj.set('src', src)
+        obj.set('autoplay', '')
+        obj.set('loop', '')
+        return obj
+
+
 class NomMD(markdown.Extension):
     """an extension that supports:
     - highlighting with the <mark> tag.
     - pdf embedding with the <iframe> tag.
     """
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
-    PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
+    PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
+    VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)(?:<\/.*>)?`?\)' # ![...](path/to/something.mp4)
 
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
@@ -47,6 +58,9 @@ class NomMD(markdown.Extension):
 
         pdf_pattern = PDFPattern(self.PDF_RE)
         md.inlinePatterns.add('pdf_link', pdf_pattern, '_begin')
+
+        vid_pattern = VideoPattern(self.VID_RE)
+        md.inlinePatterns.add('video_link', vid_pattern, '_begin')
 
 
 """

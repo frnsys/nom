@@ -93,6 +93,10 @@ html, body {
                 slides[j].style.visibility = 'hidden';
             }
             slides[i].style.visibility = 'visible';
+            var videos = slides[i].getElementsByTagName('video');
+            for (var j=0; j<videos.length; j++) {
+                videos[j].play();
+            }
             window.location.hash = i;
         }
         window.onload = scale_slides;
