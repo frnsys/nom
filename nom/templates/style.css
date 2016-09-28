@@ -22,6 +22,9 @@ video {
 img {
   max-width: 100%;
   margin: 0 auto;
+  display: inline;
+}
+figure > img {
   display: block;
 }
 a, a:visited {
