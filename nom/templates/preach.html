@@ -46,31 +46,22 @@ html, body {
 
         function scale_slides() {
             var slides = document.getElementsByClassName('slide'),
+                win_width = window.innerWidth,
                 win_height = window.innerHeight;
             for (var i=0; i<slides.length; i++) {
                 var slide = slides[i],
-                    slide_height = slide.scrollHeight;
-                if (slide_height > win_height) {
-                    var scale = win_height/slide_height,
-                        transform = 'scale(' + scale + ')';
-                    slide.style.transform       = transform;
+                    slide_width = slide.scrollWidth,
+                    slide_height = slide.scrollHeight,
+                    scale = Math.min(win_width/slide_width, win_height/slide_height);
+                if (scale < 1) {
+                    var scaled_width = slide_width * scale,
+                        offset = win_width/2 - scaled_width/2;
+                    slide.style.transform       = 'translate(' + offset + 'px, 0) scale(' + scale + ')';
                     slide.style.transformOrigin = '0 0';
-
-                    // lock-in the width of scaled images
-                    // if we don't, the image could scale up when we change the slide width (below)
-                    var imgs = slide.getElementsByTagName('img');
-                    for (var j=0; j<imgs.length; j++) {
-                        var computedWidth = window.getComputedStyle(imgs[j], null).getPropertyValue('width');
-                        imgs[j].style.width = computedWidth;
-                    }
-
-                    // manually set the slide width so we can use the full window width (not just the scaled slide width)
-                    var paddingLeft = parseInt(window.getComputedStyle(slide, null).getPropertyValue('padding-left')),
-                        paddingRight = parseInt(window.getComputedStyle(slide, null).getPropertyValue('padding-right'));
-                    slide.style.width = ((window.innerWidth - paddingLeft - paddingRight) * (1/scale)).toString() + 'px';
                 }
             }
         }
+
 
         // Build slides out of the note html, interpreting `hr` as a slide break.
         for (var i=0; i<nodes.length; i++) {
@@ -99,8 +90,11 @@ html, body {
             }
             window.location.hash = i;
         }
-        window.onload = scale_slides;
-        show_slide(curr_slide);
+        window.onload = function() {
+            scale_slides();
+            show_slide(curr_slide);
+        };
+        window.onresize = scale_slides;
 
         // Key navigation.
         document.onkeydown = function(e) {

@@ -1,5 +1,11 @@
 @import 'https://fonts.googleapis.com/css?family=Libre+Franklin:400,400i,700,700i';
 
+* {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
 html, body {
   padding: 0 1em;
   font-family: "Libre Franklin", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
@@ -22,16 +28,14 @@ a, a:visited {
   color: #8765FB;
 }
 .slide {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
   visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
   padding: 2em;
-}
-.slide:first-child {
-  visibility: visible;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-width: 100%;
 }
 .slide > h1:first-child,
 .slide > h2:first-child,
@@ -60,6 +64,7 @@ pre {
   font-size: 1.2em;
   background: #F5F5F5;
   overflow-x: scroll;
+  margin: 0;
 }
 hr {
   margin: 3em 0;
