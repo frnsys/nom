@@ -82,6 +82,11 @@ html, body {
         function show_slide(i) {
             for (var j=0; j<slides.length; j++) {
                 slides[j].style.visibility = 'hidden';
+                var videos = slides[j].getElementsByTagName('video');
+                for (var k=0; k<videos.length; k++) {
+                    videos[k].pause();
+                    videos[k].currentTime = 0;
+                }
             }
             slides[i].style.visibility = 'visible';
             var videos = slides[i].getElementsByTagName('video');
