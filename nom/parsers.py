@@ -10,7 +10,7 @@ from lxml.html import fromstring, tostring
 
 # Markdown regexes
 md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
-md_img_re = re.compile(r'!\[.*?\]\(`?([^`\(\)]+)`?\)')
+md_img_re = re.compile(r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)(?:<\/.*>)?`?\)')
 
 USER_AGENT='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
 
@@ -42,7 +42,7 @@ def remove_md(md):
 
 def md_images(md):
     """extract image references from markdown"""
-    return [img for img in md_img_re.findall(md)]
+    return [img for _, img in md_img_re.findall(md)]
 
 
 def md_links(md):
