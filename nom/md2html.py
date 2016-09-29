@@ -105,7 +105,6 @@ FIGURES = [u'^\s*'+IMAGE_LINK_RE+u'\s*$', u'^\s*'+IMAGE_REFERENCE_RE+u'\s*$'] #i
 class FigureCaptionProcessor(BlockProcessor):
     FIGURES_RE = re.compile('|'.join(f for f in FIGURES))
     def test(self, parent, block): # is the block relevant
-        # Wenn es ein Bild gibt und das Bild alleine im paragraph ist, und das Bild nicht schon einen figure parent hat, returne True
         isImage = bool(self.FIGURES_RE.search(block))
         isOnlyOneLine = (len(block.splitlines())== 1)
         isInFigure = (parent.tag == 'figure')

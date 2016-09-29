@@ -40,6 +40,10 @@ html, body {
             for(var j=0; j<elms.length; j++) {
                 slide.appendChild(elms[j]);
             }
+
+            if (slide.getElementsByClassName('background').length > 0) {
+                slide.className += ' has-background';
+            }
             out.appendChild(slide);
             return slide;
         }
