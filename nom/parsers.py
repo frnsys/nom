@@ -8,9 +8,12 @@ from html.parser import HTMLParser
 from lxml.html import fromstring, tostring
 
 
-# Markdown regexes
+# markdown regexes
 md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
-md_img_re = re.compile(r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)(?:<\/.*>)?`?\)')
+
+# supports urls in image captions
+# supports multiple images in one line
+md_img_re = re.compile(r'\!\[((?:(?!\!\[).)*)\]\(`?(?:<.*>)?([^`\(\)]+)(?:<\/.*>)?`?\)')
 
 USER_AGENT='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
 
