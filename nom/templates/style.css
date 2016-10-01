@@ -102,6 +102,7 @@ iframe {
   background: #fff;
   max-width: 50%;
   left: 1em;
+  z-index: 2;
 }
 
 .background-attribution {
