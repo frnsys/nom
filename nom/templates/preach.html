@@ -62,6 +62,12 @@ html, body {
                         offset = win_width/2 - scaled_width/2;
                     slide.style.transform       = 'translate(' + offset + 'px, 0) scale(' + scale + ')';
                     slide.style.transformOrigin = '0 0';
+
+                    // compensate background scaling
+                    var backgrounds = slide.getElementsByClassName('background');
+                    for (var j=0; j < backgrounds.length; j++) {
+                        backgrounds[j].style.transform = 'scale(' + 1/scale + ')';
+                    }
                 }
             }
         }
@@ -105,6 +111,19 @@ html, body {
         };
         window.onresize = scale_slides;
 
+        // used to update other windows in the slideshow
+        // for this to work, you can't open as `file://`
+        // you need to run it off a local server
+        function broadcast_slide(idx) {
+            localStorage.setItem('slide', idx);
+        }
+        window.addEventListener('storage', function(ev) {
+            if (ev.key === 'slide') {
+                var idx = parseInt(ev.newValue);
+                show_slide(idx);
+            }
+        }, false);
+
         // Key navigation.
         document.onkeydown = function(e) {
             e = e || window.event;
@@ -113,6 +132,7 @@ html, body {
                     if (curr_slide < slides.length - 1) {
                         curr_slide += 1;
                         show_slide(curr_slide);
+                        broadcast_slide(curr_slide);
                     }
                     e.preventDefault();
                     break;
@@ -120,6 +140,7 @@ html, body {
                     if (curr_slide > 0) {
                         curr_slide -= 1;
                         show_slide(curr_slide);
+                        broadcast_slide(curr_slide);
                     }
                     e.preventDefault();
                     break;
