@@ -120,7 +120,8 @@ html, body {
         window.addEventListener('storage', function(ev) {
             if (ev.key === 'slide') {
                 var idx = parseInt(ev.newValue);
-                show_slide(idx);
+                curr_slide = idx;
+                show_slide(curr_slide);
             }
         }, false);
 
