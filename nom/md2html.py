@@ -5,6 +5,8 @@ from markdown.extensions import attr_list
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
+AT = attr_list.AttrListTreeprocessor()
+
 
 def compile_markdown(md):
     """compiles markdown to html"""
@@ -16,7 +18,6 @@ def compile_markdown(md):
         'markdown.extensions.footnotes',
         'markdown.extensions.attr_list'
     ], lazy_ol=False)
-
 
 
 class PDFPattern(ImagePattern):
@@ -34,11 +35,22 @@ class PDFPattern(ImagePattern):
         return fig
 
 
-AT = attr_list.AttrListTreeprocessor()
 class VideoPattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
         obj = etree.Element('video')
+        obj.set('src', src)
+
+        attrs = m.group(5)
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
+        return obj
+
+
+class IFramePattern(ImagePattern):
+    def handleMatch(self, m):
+        src = m.group(3)
+        obj = etree.Element('iframe')
         obj.set('src', src)
 
         attrs = m.group(5)
@@ -55,6 +67,7 @@ class NomMD(markdown.Extension):
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
     PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
     VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
+    URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[](http://web.site){: .fullscreen}
 
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
@@ -65,6 +78,9 @@ class NomMD(markdown.Extension):
 
         vid_pattern = VideoPattern(self.VID_RE)
         md.inlinePatterns.add('video_link', vid_pattern, '_begin')
+
+        url_pattern = IFramePattern(self.URL_RE)
+        md.inlinePatterns.add('iframe_link', url_pattern, '_begin')
 
 
 """

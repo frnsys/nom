@@ -81,6 +81,7 @@ hr {
 iframe {
   display: block;
   margin: 0 auto;
+  border: 4px solid #282828;
 }
 
 .background {
@@ -131,6 +132,18 @@ iframe {
 figcaption {
   text-align: center;
   color: rgba(0,0,0,0.5);
+}
+
+/* can't do 100% w/h b/c then
+ * we have no where to click in the parent */
+iframe.fullscreen {
+  width: 90vw;
+  height: 90vh;
+  position: fixed;
+  top: 5vh;
+  left: 5vw;
+  right: 5vw;
+  bottom: 5vh;
 }
 
 .has-text::after {
