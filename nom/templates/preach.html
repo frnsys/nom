@@ -109,6 +109,14 @@ html, body {
             scale_slides();
             show_slide(curr_slide);
         };
+
+        // window.onload doesn't always fire
+        // this is a backup
+        setTimeout(function() {
+            scale_slides();
+            show_slide(curr_slide);
+        }, 5000);
+
         window.onresize = scale_slides;
 
         // used to update other windows in the slideshow
