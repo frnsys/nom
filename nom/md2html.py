@@ -1,6 +1,7 @@
 import re
 import markdown
 from markdown.util import etree
+from markdown.extensions import attr_list
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
@@ -33,23 +34,16 @@ class PDFPattern(ImagePattern):
         return fig
 
 
-VID_ATTRS = ['autoplay', 'loop', 'controls', 'muted']
+AT = attr_list.AttrListTreeprocessor()
 class VideoPattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
-        attrs = m.group(4)
-        if attrs is not None:
-            attrs = attrs.strip().split()
-        else:
-            attrs = []
         obj = etree.Element('video')
         obj.set('src', src)
 
-        for attr in VID_ATTRS:
-            if attr in attrs:
-                obj.set(attr, attr)
-            else:
-                obj.set(attr, '')
+        attrs = m.group(5)
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
         return obj
 
 
@@ -60,7 +54,7 @@ class NomMD(markdown.Extension):
     """
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
     PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
-    VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)( [a-z ]+)?(?:<\/.*>)?`?\)' # ![...](path/to/something.mp4)
+    VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
 
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
