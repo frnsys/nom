@@ -22,6 +22,7 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
         click.launch(outpath)
     if watch:
         watch_note(note, f)
+    return outpath
 
 
 @cli.command()
@@ -49,10 +50,18 @@ def export(note, outdir, watch, view, style):
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
+@click.option('-S', '--static', is_flag=True, help='compile as static presentation')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
-def preach(note, outdir, watch, view, style):
+def preach(note, outdir, watch, view, static, style):
     """export a note to an html presentation"""
-    compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach')
+    path = compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach')
+    if static:
+        with open(path, 'r') as f:
+            data = f.read()
+        data = data.replace('static = false', 'static = true')
+        print(data)
+        with open(path, 'w') as f:
+            f.write(data)
 
 
 @cli.command()

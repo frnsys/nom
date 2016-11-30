@@ -2,7 +2,7 @@
 
 {% block styles %}
 <style>
-html, body {
+body {
     overflow: hidden;
     font-size: 1.5em;
 }
@@ -19,7 +19,8 @@ html, body {
     </main>
 
     <script type="text/javascript">
-        var nodes = document.getElementById('note').childNodes,
+        var static = false,
+            nodes = document.getElementById('note').childNodes,
             out = document.getElementById('presentation'),
             els = [[]],
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
@@ -105,9 +106,22 @@ html, body {
             }
             window.location.hash = i;
         }
+
+        function make_static() {
+            for (var j=0; j<slides.length; j++) {
+                slides[j].style.visibility = 'visible';
+                slides[j].style.position = 'relative';
+                slides[j].style.transform = '';
+            }
+            document.body.style.overflow = 'auto';
+        }
+
         window.onload = function() {
             scale_slides();
             show_slide(curr_slide);
+            if (static) {
+                make_static();
+            }
         };
 
         // window.onload doesn't always fire
@@ -115,6 +129,9 @@ html, body {
         setTimeout(function() {
             scale_slides();
             show_slide(curr_slide);
+            if (static) {
+                make_static();
+            }
         }, 5000);
 
         window.onresize = scale_slides;
@@ -125,34 +142,39 @@ html, body {
         function broadcast_slide(idx) {
             localStorage.setItem('slide', idx);
         }
-        window.addEventListener('storage', function(ev) {
-            if (ev.key === 'slide') {
-                var idx = parseInt(ev.newValue);
-                curr_slide = idx;
-                show_slide(curr_slide);
-            }
-        }, false);
 
-        // Key navigation.
-        document.onkeydown = function(e) {
-            e = e || window.event;
-            switch(e.which || e.keyCode) {
-                case 40: // down
-                    if (curr_slide < slides.length - 1) {
-                        curr_slide += 1;
-                        show_slide(curr_slide);
-                        broadcast_slide(curr_slide);
-                    }
-                    e.preventDefault();
-                    break;
-                case 38: // up
-                    if (curr_slide > 0) {
-                        curr_slide -= 1;
-                        show_slide(curr_slide);
-                        broadcast_slide(curr_slide);
-                    }
-                    e.preventDefault();
-                    break;
+        if (!static) {
+            window.addEventListener('storage', function(ev) {
+                if (ev.key === 'slide') {
+                    var idx = parseInt(ev.newValue);
+                    curr_slide = idx;
+                    show_slide(curr_slide);
+                }
+            }, false);
+
+            // Key navigation.
+            document.onkeydown = function(e) {
+                e = e || window.event;
+                switch(e.which || e.keyCode) {
+                    case 40: // down
+                    case 78: // n
+                        if (curr_slide < slides.length - 1) {
+                            curr_slide += 1;
+                            show_slide(curr_slide);
+                            broadcast_slide(curr_slide);
+                        }
+                        e.preventDefault();
+                        break;
+                    case 38: // up
+                    case 66: // b
+                        if (curr_slide > 0) {
+                            curr_slide -= 1;
+                            show_slide(curr_slide);
+                            broadcast_slide(curr_slide);
+                        }
+                        e.preventDefault();
+                        break;
+                }
             }
         }
     </script>
