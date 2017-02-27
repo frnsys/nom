@@ -9,7 +9,7 @@ from lxml.html import fromstring, tostring
 
 
 # markdown regexes
-md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
+md_link_re = re.compile(r'\[([^)]*)\]\(`?([^`\(\)]+)`?\)')
 
 # supports urls in image captions
 # supports multiple images in one line
@@ -116,9 +116,12 @@ def _is_remote_image_link(link):
     else:
         try:
             res = requests.head(link, timeout=5)
-            ctype, ext = res.headers['Content-Type'].split('/')
-            if ctype == 'image':
-                return True, ext
+            if '/' not in res.headers['Content-Type']:
+                return False, None
+            else:
+                ctype, ext = res.headers['Content-Type'].split('/')
+                if ctype == 'image':
+                    return True, ext
         except (KeyError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout,
