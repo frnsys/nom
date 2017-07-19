@@ -10,6 +10,10 @@ html, body {
   padding: 0 1em;
   font-family: "Libre Franklin", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
+main {
+  max-width: 820px;
+  margin: 0 auto;
+}
 figure {
   margin: 0 auto;
 }
