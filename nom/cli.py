@@ -10,13 +10,14 @@ def cli():
     pass
 
 
-def compile_note(note, outdir, watch=False, view=False, style=None, templ='default', ignore_missing=False):
+def compile_note(note, outdir, watch=False, view=False, style=None, templ='default', ignore_missing=False, comments=False):
     note = util.abs_path(note)
     f = partial(compile.compile_note,
                 outdir=outdir,
                 templ=templ,
                 stylesheet=style,
-                ignore_missing=ignore_missing)
+                ignore_missing=ignore_missing,
+                comments=comments)
     outpath = f(note)
     if view:
         click.launch(outpath)
@@ -54,7 +55,7 @@ def export(note, outdir, watch, view, style):
 @click.option('-s', '--style', help='stylesheet to use', default=None)
 def preach(note, outdir, watch, view, static, style):
     """export a note to an html presentation"""
-    path = compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach')
+    path = compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach', comments=True)
     if static:
         with open(path, 'r') as f:
             data = f.read()

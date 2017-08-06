@@ -8,16 +8,19 @@ from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 AT = attr_list.AttrListTreeprocessor()
 
 
-def compile_markdown(md):
+def compile_markdown(md, comments=False):
     """compiles markdown to html"""
-    return markdown.markdown(md, extensions=[
+    extensions = [
         GFM(),
         NomMD(),
         MathJaxExtension(),
         FigureCaptionExtension(),
         'markdown.extensions.footnotes',
         'markdown.extensions.attr_list'
-    ], lazy_ol=False)
+    ]
+    if comments:
+        extensions.append(CommentExtension())
+    return markdown.markdown(md, extensions=extensions, lazy_ol=False)
 
 
 class PDFPattern(ImagePattern):
@@ -99,6 +102,28 @@ class MathJaxExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
         # Needs to come before escape matching because \ is pretty important in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
+
+
+"""
+compile html comments into elements,
+for preach presenter notes
+"""
+from markdown.postprocessors import Postprocessor
+class CommentProcessor(Postprocessor):
+    COMMENTS_RE = re.compile('<!--(((?!-->).)+)-->', re.DOTALL)
+    def run(self, text):
+        return self.COMMENTS_RE.sub(self.compile_comment, text)
+
+    def compile_comment(self, match):
+        text = match.group(1)
+        html = compile_markdown(text)
+        return '\n<div class="comment">\n{}\n</div>'.format(html)
+
+class CommentExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.postprocessors.add('commentAltExtension',
+                                CommentProcessor(md.parser),
+                                '>raw_html')
 
 
 """

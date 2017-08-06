@@ -25,6 +25,14 @@ body {
             els = [[]],
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
 
+        // check if this should show presenter notes
+        if (window.location.href.includes('?notes')) {
+            var comments = document.getElementsByClassName('comment');
+            for (var i=0; i < comments.length; i++) {
+                comments[i].style.display = 'block';
+            }
+        }
+
         // setup backgrounds
         var backgrounds = document.getElementsByClassName('background');
         for (var i=0; i < backgrounds.length; i++) {
