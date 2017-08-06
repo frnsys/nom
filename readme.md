@@ -76,6 +76,8 @@ First of all, when running a `preach` presentation it's recommended to use the P
 
 You can visit `localhost:8001` in two separate browser tabs and the presentations will be synced. So you can run a copy on one screen and another on the projector.
 
+### Speaker notes
+
 You can also include speaker notes as HTML comments, e.g.:
 
 ```
@@ -97,6 +99,8 @@ these are my notes for the second slide.
 ```
 
 To view these comments, open up the presentation url with a `notes` query param, e.g. `localhost:8001?notes`.
+
+### Included classes/attributes
 
 There are also some built-in CSS classes for convenience:
 
