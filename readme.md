@@ -55,3 +55,19 @@ A bit more about each command:
     - pass `-v` to view the compiled note in your browser
     - pass `-s` with a path to a stylesheet to apply style overrides
 - `preach`: similar to `export`, except it creates an HTML slideshow, interpreting `---` as slide breaks. Slides are advanced using the arrow keys. Accepts the same options as `export`.
+
+
+## markdown extensions
+
+`nom` supports the following extra markdown patterns:
+
+- embed a pdf: `![](/path/to.pdf)`
+- embed an mp4: `![](/path/to.mp4)`
+    - to autoplay an mp4: `![](/path/to.mp4){: autoplay}`
+- embed an iframe: `@[](https://web.site)`
+
+for the `preach` functionality there are some built-in CSS classes for convenience:
+
+- fullscreen iframe: `@[](https://web.site){: .fullscreen}`
+- fullscreen background image: `![](/path/to.jpg){: .background}`
+
