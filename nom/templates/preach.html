@@ -46,13 +46,18 @@ body {
             var slide = document.createElement('div');
             slide.className = 'slide';
 
+            var slideContent = document.createElement('div');
+            slideContent.className = 'slide-content';
+
             for(var j=0; j<elms.length; j++) {
-                slide.appendChild(elms[j]);
+                slideContent.appendChild(elms[j]);
             }
 
             if (slide.getElementsByClassName('background').length > 0) {
                 slide.className += ' has-background';
             }
+
+            slide.appendChild(slideContent);
             out.appendChild(slide);
             return slide;
         }
