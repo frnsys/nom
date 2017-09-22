@@ -33,19 +33,15 @@ body {
             }
         }
 
-        // setup backgrounds
-        var backgrounds = document.getElementsByClassName('background');
-        for (var i=0; i < backgrounds.length; i++) {
-            if (backgrounds[i].src !== undefined) {
-                backgrounds[i].style.backgroundImage = 'url(' + backgrounds[i].src + ')';
-                backgrounds[i].src = '';
-            }
-        }
-
         function build_slide(elms) {
             var slide = document.createElement('div');
             slide.className = 'slide';
 
+            // to vertically center slide content
+            var slideBody = document.createElement('div');
+            slideBody.className = 'slide-body';
+
+            // to hold actual slide content
             var slideContent = document.createElement('div');
             slideContent.className = 'slide-content';
 
@@ -53,11 +49,12 @@ body {
                 slideContent.appendChild(elms[j]);
             }
 
+            slideBody.appendChild(slideContent);
             if (slide.getElementsByClassName('background').length > 0) {
                 slide.className += ' has-background';
             }
 
-            slide.appendChild(slideContent);
+            slide.appendChild(slideBody);
             out.appendChild(slide);
             return slide;
         }
@@ -102,6 +99,16 @@ body {
         document.getElementById('note').style.display = 'none';
 
         var slides = document.getElementsByClassName('slide');
+
+        // setup backgrounds
+        var backgrounds = document.getElementsByClassName('background');
+        for (var i=0; i < backgrounds.length; i++) {
+            if (backgrounds[i].src !== undefined) {
+                backgrounds[i].style.backgroundImage = 'url(' + backgrounds[i].src + ')';
+                backgrounds[i].src = '';
+                backgrounds[i].closest('.slide').appendChild(backgrounds[i]);
+            }
+        }
 
         function show_slide(i) {
             for (var j=0; j<slides.length; j++) {
