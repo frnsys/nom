@@ -1,5 +1,7 @@
 import re
+import base64
 import markdown
+import subprocess
 from markdown.util import etree
 from markdown.extensions import attr_list
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
@@ -15,6 +17,7 @@ def compile_markdown(md, comments=False):
         NomMD(),
         MathJaxExtension(),
         FigureCaptionExtension(),
+        InlineGraphvizExtension(),
         'markdown.extensions.footnotes',
         'markdown.extensions.attr_list'
     ]
@@ -181,3 +184,74 @@ class FigureCaptionExtension(markdown.Extension):
         md.parser.blockprocessors.add('figureAltcaption',
                                       FigureCaptionProcessor(md.parser),
                                       '<ulist')
+
+
+# InlineGraphViz, from <https://github.com/sprin/markdown-inline-graphviz>
+BLOCK_RE = re.compile(
+    r'^\{% (?P<command>\w+)\s+(?P<filename>[^\s]+)\s*\n(?P<content>.*?)%}\s*$',
+    re.MULTILINE | re.DOTALL)
+SUPPORTED_COMMAMDS = ['dot', 'neato', 'fdp', 'sfdp', 'twopi', 'circo']
+
+
+class InlineGraphvizExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        """ Add InlineGraphvizPreprocessor to the Markdown instance. """
+        md.preprocessors.add('graphviz_block',
+                             InlineGraphvizPreprocessor(md), '_begin')
+
+class InlineGraphvizPreprocessor(markdown.preprocessors.Preprocessor):
+    def __init__(self, md):
+        super(InlineGraphvizPreprocessor, self).__init__(md)
+
+    def run(self, lines):
+        """ Match and generate dot code blocks."""
+
+        text = "\n".join(lines)
+        while 1:
+            m = BLOCK_RE.search(text)
+            if m:
+                command = m.group('command')
+                # Whitelist command, prevent command injection.
+                if command not in SUPPORTED_COMMAMDS:
+                    raise Exception('Command not supported: %s' % command)
+                filename = m.group('filename')
+                content = m.group('content')
+                filetype = filename[filename.rfind('.')+1:]
+
+                args = [command, '-T'+filetype]
+                try:
+                    proc = subprocess.Popen(
+                        args,
+                        stdin=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        stdout=subprocess.PIPE)
+                    proc.stdin.write(content.encode('utf-8'))
+
+                    output, err = proc.communicate()
+
+                    if filetype == 'svg':
+                        data_url_filetype = 'svg+xml'
+                        encoding = 'utf-8'
+                        img = output.decode(encoding)
+
+                    if filetype == 'png':
+                        data_url_filetype = 'png'
+                        encoding = 'base64'
+                        output = base64.b64encode(output)
+                        data_path = "data:image/%s;%s,%s" % (
+                            data_url_filetype,
+                            encoding,
+                            output)
+                        img = "![" + filename + "](" + data_path + ")"
+
+                    text = '%s\n%s\n%s' % (
+                        text[:m.start()], img, text[m.end():])
+
+                except Exception as e:
+                        err = str(e) + ' : ' + str(args)
+                        return (
+                            '<pre>Error : ' + err + '</pre>'
+                            '<pre>' + content + '</pre>').split('\n')
+            else:
+                break
+        return text.split("\n")
