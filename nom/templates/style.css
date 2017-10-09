@@ -15,8 +15,9 @@ main {
   max-width: 820px;
   margin: 0 auto;
 }
-figure {
+figure, svg {
   margin: 0 auto;
+  display: block;
 }
 video {
   margin: -1em auto 0 auto;

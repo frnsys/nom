@@ -241,7 +241,7 @@ class InlineGraphvizPreprocessor(markdown.preprocessors.Preprocessor):
                         data_path = "data:image/%s;%s,%s" % (
                             data_url_filetype,
                             encoding,
-                            output)
+                            output.decode('utf8'))
                         img = "![" + filename + "](" + data_path + ")"
 
                     text = '%s\n%s\n%s' % (
