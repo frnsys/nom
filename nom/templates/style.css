@@ -53,8 +53,8 @@ a, a:visited {
 }
 .slide-body {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  /* top: 50%; */
+  /* transform: translateY(-50%); */
   width: 100%;
 }
 .slide-content {
@@ -186,6 +186,31 @@ iframe.fullscreen {
   top: 0;
   bottom: 0;
   background: rgba(0,0,0,0.5);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+  border: 2px solid #c0c0c0;
+  margin: 1em auto;
+}
+td, th {
+  border-left: 2px solid #c0c0c0;
+  border-width: 0 0 0 2px;
+  font-size: inherit;
+  margin: 0;
+  overflow: visible;
+  padding: 0.5em 1em;
+}
+thead {
+  background-color: #e0e0e0;
+  color: #000;
+  text-align: left;
+  vertical-align: bottom;
+}
+tr:nth-child(2n-1) td {
+  background-color: #e9e9e9;
 }
 
 
