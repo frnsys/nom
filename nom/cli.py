@@ -48,7 +48,7 @@ def export(note, outdir, watch, view, style):
 
 @cli.command()
 @click.argument('note')
-@click.argument('outdir')
+@click.option('-o', '--outdir', default='/tmp')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
 @click.option('-S', '--static', is_flag=True, help='compile as static presentation')
