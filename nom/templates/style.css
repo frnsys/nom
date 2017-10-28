@@ -73,7 +73,10 @@ a, a:visited {
 }
 .comment p {
   margin: 0em 0 0.5em;
-  background: #fff;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 0.5em;
 }
 
 .vcenter {
