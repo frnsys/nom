@@ -1,6 +1,7 @@
 import time
 from os import path
 from nom import util
+from nom.server import MarkdownServer
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
@@ -11,6 +12,8 @@ def watch_note(note, handle_func):
     ob = Observer()
     handler = FileSystemEventHandler()
     note_filename = path.basename(note)
+    server = MarkdownServer()
+    server.start()
 
     def handle_event(event):
         _, filename = path.split(event.src_path)
@@ -18,6 +21,7 @@ def watch_note(note, handle_func):
                 path.normpath(event.src_path) == path.normpath(util.assets_dir(note)):
             print('compiling...')
             handle_func(note)
+            server.update_clients()
             print('done')
     handler.on_any_event = handle_event
 
@@ -31,4 +35,5 @@ def watch_note(note, handle_func):
     except KeyboardInterrupt:
         print('stopping...')
         ob.stop()
+    server.shutdown()
     ob.join()

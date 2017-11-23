@@ -10,7 +10,7 @@ env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
 
-def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False):
+def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False):
     title, _ = os.path.basename(note).rsplit('.', 1)
     content = open(note, 'r').read()
     templ = env.get_template('{}.html'.format(templ))
@@ -59,7 +59,7 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
 
     # render the presentation
     html = md2html.compile_markdown(content, comments=comments)
-    content = templ.render(html=html, title=title)
+    content = templ.render(html=html, title=title, preview=preview)
 
     # save it
     outpath = os.path.join(outdir, 'index.html')

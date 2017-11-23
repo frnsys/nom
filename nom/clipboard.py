@@ -7,6 +7,8 @@ if 'darwin' in sys.platform:
         NSPasteboard = None
 elif 'linux' in sys.platform:
     try:
+        import gi
+        gi.require_version('Gtk', '3.0')
         from gi.repository import Gtk, Gdk
     except ImportError:
         Gtk = None

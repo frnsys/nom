@@ -17,4 +17,15 @@
             }
         });
     </script>
+    {% if preview %}
+    <script>
+        // Connect to Web Socket
+        var ws = new WebSocket("ws://localhost:9001/");
+        ws.onmessage = function(e) {
+            if (e.data === 'update') {
+                window.location.reload();
+            }
+        };
+    </script>
+    {% endif %}
 {% endblock %}

@@ -19,7 +19,7 @@ body {
     </main>
 
     <script type="text/javascript">
-        var static = false,
+        var static = window.location.href.includes('static'),
             nodes = document.getElementById('note').childNodes,
             out = document.getElementById('presentation'),
             els = [[]],
@@ -30,6 +30,10 @@ body {
             var comments = document.getElementsByClassName('comment');
             for (var i=0; i < comments.length; i++) {
                 comments[i].style.display = 'block';
+                if (static) {
+                    comments[i].style.position = 'relative';
+                    comments[i].style.left = 0;
+                }
             }
         }
 
@@ -128,33 +132,39 @@ body {
         }
 
         function make_static() {
+            var slideBodies = document.getElementsByClassName('slide-body');
             for (var j=0; j<slides.length; j++) {
                 slides[j].style.visibility = 'visible';
                 slides[j].style.position = 'relative';
                 slides[j].style.transform = '';
+                slideBodies[j].style.position = 'relative';
             }
             document.body.style.overflow = 'auto';
         }
 
         window.onload = function() {
-            scale_slides();
-            show_slide(curr_slide);
             if (static) {
                 make_static();
+            } else {
+                scale_slides();
+                show_slide(curr_slide);
             }
         };
 
         // window.onload doesn't always fire
         // this is a backup
         setTimeout(function() {
-            scale_slides();
-            show_slide(curr_slide);
             if (static) {
                 make_static();
+            } else {
+                scale_slides();
+                show_slide(curr_slide);
             }
         }, 5000);
 
-        window.onresize = scale_slides;
+        if (!static) {
+            window.onresize = scale_slides;
+        }
 
         // used to update other windows in the slideshow
         // for this to work, you can't open as `file://`

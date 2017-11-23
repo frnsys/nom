@@ -17,7 +17,8 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
                 templ=templ,
                 stylesheet=style,
                 ignore_missing=ignore_missing,
-                comments=comments)
+                comments=comments,
+                preview=True)
     outpath = f(note)
     if view:
         click.launch(outpath)
