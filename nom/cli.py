@@ -3,6 +3,7 @@ import click
 from functools import partial
 from nom import html2md, parsers, compile, util
 from nom.watch import watch_note
+from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
 
 @click.group()
@@ -23,7 +24,13 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
     if view:
         click.launch(outpath)
     if watch:
-        watch_note(note, f)
+        server = MarkdownServer()
+        server.start()
+        def handler(note):
+            f(note)
+            server.update_clients()
+        watch_note(note, handler)
+        server.shutdown()
     return outpath
 
 

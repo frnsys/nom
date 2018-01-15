@@ -19,7 +19,8 @@ setup(
         'lxml==3.5.0',
         'py-gfm==0.1.1',
         'watchdog==0.8.3',
-        'Pygments==2.1.3'
+        'Pygments==2.1.3',
+        'websocket-server==0.4'
     ],
     entry_points='''
         [console_scripts]
