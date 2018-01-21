@@ -19,7 +19,8 @@ def compile_markdown(md, comments=False):
         FigureCaptionExtension(),
         InlineGraphvizExtension(),
         'markdown.extensions.footnotes',
-        'markdown.extensions.attr_list'
+        'markdown.extensions.attr_list',
+        'markdown.extensions.headerid',
     ]
     if comments:
         extensions.append(CommentExtension())
