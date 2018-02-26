@@ -45,13 +45,18 @@ class PDFPattern(ImagePattern):
 class VideoPattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
-        obj = etree.Element('video')
+        fig = etree.Element('figure')
+        obj = etree.SubElement(fig, 'video')
         obj.set('src', src)
 
         attrs = m.group(5)
+        caption = m.group(2)
+        if caption:
+            cap = etree.SubElement(fig, 'figcaption')
+            cap.text = caption
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
-        return obj
+        return fig
 
 
 class IFramePattern(ImagePattern):
