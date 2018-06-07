@@ -70,6 +70,9 @@ a, a:visited {
   bottom: 0;
   padding: 0.5em;
   font-size: 0.85em;
+  height: 100%;
+  overflow-y: scroll;
+  z-index: 2;
 }
 .comment p {
   margin: 0em 0 0.5em;
@@ -115,15 +118,17 @@ iframe {
   display: block;
   margin: 0 auto;
   border: 4px solid #282828;
+  width: 100%;
+  min-height: 480px;
 }
 
 .background {
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: -1;
+  z-index: 0;
   background-size: cover;
   background-position: center center;
   width: 100%;
@@ -132,10 +137,10 @@ iframe {
 
 .background-caption {
   position: absolute;
-  bottom: 1em;
   color: #fff;
   background: rgba(0,0,0,0.8);
   max-width: 50%;
+  top: 0;
   left: 1em;
   z-index: 2;
   padding: 1em;
@@ -174,7 +179,7 @@ figcaption {
 iframe.fullscreen {
   width: 90vw;
   height: 90vh;
-  position: fixed;
+  position: absolute;
   top: 5vh;
   left: 5vw;
   right: 5vw;
@@ -183,7 +188,7 @@ iframe.fullscreen {
 
 .has-text::after {
   content: "";
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   top: 0;
@@ -279,3 +284,12 @@ tr:nth-child(2n-1) td {
 .highlight .vg { color: #008080 } /* Name.Variable.Global */
 .highlight .vi { color: #008080 } /* Name.Variable.Instance */
 .highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+
+@media only screen and (max-width: 720px) {
+  html, body {
+    padding: 0;
+  }
+  .slide-content {
+    padding: 0;
+  }
+}
