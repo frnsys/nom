@@ -13,7 +13,10 @@ env.loader = FileSystemLoader(templ_dir)
 def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False):
     title, _ = os.path.basename(note).rsplit('.', 1)
     content = open(note, 'r').read()
-    templ = env.get_template('{}.html'.format(templ))
+    if templ.endswith('.html'):
+        templ = env.from_string(open(templ, 'r').read())
+    else:
+        templ = env.get_template('{}.html'.format(templ))
 
     # create output directory if necessary
     outdir = os.path.join(outdir, title)

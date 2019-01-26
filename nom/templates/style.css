@@ -186,6 +186,9 @@ iframe.fullscreen {
   bottom: 5vh;
 }
 
+.has-text {
+  z-index: -1;
+}
 .has-text::after {
   content: "";
   position: absolute;

@@ -1,7 +1,8 @@
 import os
+import sys
 import click
 from functools import partial
-from nom import html2md, parsers, compile, util
+from nom import html2md, md2html, parsers, compile, util
 from nom.watch import watch_note
 from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
@@ -38,9 +39,11 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
 @click.argument('note')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-i', '--ignore', is_flag=True, help='ignore missing assets')
-def view(note, watch, ignore):
+@click.option('-s', '--style', help='stylesheet to use', default=None)
+@click.option('-t', '--templ', help='template to use', default='default')
+def view(note, watch, ignore, style, templ):
     """view a note in the browser"""
-    compile_note(note, '/tmp', view=True, watch=watch, ignore_missing=ignore)
+    compile_note(note, '/tmp', view=True, watch=watch, ignore_missing=ignore, style=style, templ=templ)
 
 
 @cli.command()
@@ -110,3 +113,10 @@ def clip(save, edit, view, overwrite):
 
     if view:
         compile_note(note, '/tmp', view=True)
+
+
+@cli.command()
+def convert():
+    """convert markdown from stdin to html"""
+    md = sys.stdin.read()
+    print(md2html.compile_markdown(md))
