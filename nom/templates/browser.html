@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <main role="main">
+        <ul>
+            {% for note in notes %}
+                <li><a href="{{ note }}/index.html">{{ note }}</a></li>
+            {% endfor %}
+        </ul>
+        {% if dirs %}
+            <h2>subdirs</h2>
+            <ul>
+            {% for dir in dirs %}
+                <li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+{% endblock %}
+

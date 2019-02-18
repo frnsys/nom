@@ -50,6 +50,7 @@ A bit more about each command:
     - pass `-o` to overwrite an existing note, if there is one
 - `view`: compiles and opens a note in the browser
     - pass `-w` to continually watch the original markdown file and its assets and recompile on changes
+- `browse`: compiles notes in a directory and its subdirectories and opens in the browser
 - `export`: to export a markdown file with its assets as a self-contained site, run `nom export ~/notes/foo.md .`. This will create a folder `foo` with the compiled note and its assets.
     - pass `-w` to continually watch the original markdown file and its assets and recompile on changes
     - pass `-v` to view the compiled note in your browser

@@ -60,7 +60,7 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
     with open(os.path.join(outdir, 'style.css'), 'w') as f:
         f.write(styles)
 
-    # render the presentation
+    # render
     html = md2html.compile_markdown(content, comments=comments)
     content = templ.render(html=html, title=title, preview=preview)
 

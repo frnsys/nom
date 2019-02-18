@@ -6,6 +6,7 @@ from nom import html2md, md2html, parsers, compile, util
 from nom.watch import watch_note
 from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
+from nom.compile import env
 
 @click.group()
 def cli():
@@ -33,6 +34,29 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
         watch_note(note, handler)
         server.shutdown()
     return outpath
+
+
+@cli.command()
+@click.argument('notedir')
+@click.option('-i', '--ignore', is_flag=True, help='ignore missing assets')
+def browse(notedir, ignore):
+    """browse a note directory in the browser"""
+    templ = env.get_template('browser.html')
+    for root, dirs, files in os.walk(notedir):
+        index = []
+        outdir = os.path.join('/tmp', 'nom', root)
+        os.makedirs(outdir, exist_ok=True)
+        for f in files:
+            if not f.endswith('.md'): continue
+            notepath = os.path.join(root, f)
+            compile_note(notepath, outdir, view=False, ignore_missing=ignore)
+            index.append(f.replace('.md', ''))
+
+        dirs = [d for d in dirs if d != 'assets']
+        html = templ.render(notes=index, dirs=dirs)
+        with open(os.path.join(outdir, 'index.html'), 'w') as f:
+            f.write(html)
+    click.launch('/tmp/nom/index.html')
 
 
 @cli.command()
