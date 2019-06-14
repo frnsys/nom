@@ -11,6 +11,11 @@ body {
 
 {% block content %}
     <main role="main">
+        <div id="meta">
+            <div id="timer"></div>
+            <div id="progress"></div>
+        </div>
+        <div id="notes"></div>
         <div class="note" id="note">
             {{ html }}
         </div>
@@ -26,15 +31,23 @@ body {
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
 
         // check if this should show presenter notes
-        if (window.location.href.includes('?notes')) {
-            var comments = document.getElementsByClassName('comment');
-            for (var i=0; i < comments.length; i++) {
-                comments[i].style.display = 'block';
-                if (static) {
-                    comments[i].style.position = 'relative';
-                    comments[i].style.left = 0;
-                }
-            }
+        if (window.location.href.includes('?presenter')) {
+            var notes = document.getElementById('notes');
+            notes.style.display = 'block';
+
+            var meta = document.getElementById('meta');
+            meta.style.display = 'block';
+
+            var timer = document.getElementById('timer');
+            var elapsed = 0;
+            var interval = 100;
+            timer.innerText = elapsed;
+            setInterval(() => {
+                elapsed += interval/1000;
+                let min = Math.floor(elapsed/60);
+                let sec = elapsed % 60;
+                timer.innerText = `${min}:${sec.toFixed(0)}`;
+            }, interval);
         }
 
         function build_slide(elms) {
@@ -128,6 +141,17 @@ body {
             for (var j=0; j<videos.length; j++) {
                 videos[j].play();
             }
+            let notes = document.getElementById('notes');
+            notes.innerHTML = '';
+            slides[i].querySelectorAll('.comment').forEach((el) => {
+                let div = document.createElement('div');
+                div.innerHTML = el.innerHTML;
+                notes.appendChild(div);
+            });
+
+            var progress = document.getElementById('progress');
+            progress.innerText = `${i+1}/${slides.length}`;
+
             window.location.hash = i;
         }
 
@@ -213,7 +237,7 @@ body {
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
-                inlineMath: [["$","$"]],
+                inlineMath: [["\\","\\"]],
                 displayMath: [['$$','$$']],
                 processEscapes: true
             }

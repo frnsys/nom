@@ -144,3 +144,14 @@ def convert():
     """convert markdown from stdin to html"""
     md = sys.stdin.read()
     print(md2html.compile_markdown(md))
+
+
+@cli.command()
+@click.argument('notes', nargs=-1, type=click.Path(exists=True))
+@click.option('-s', '--separator', default='===')
+def concat(notes, separator):
+    """concatenate multiple notes"""
+    agg = []
+    for n in notes:
+        agg.append(open(n, 'r').read())
+    print('\n{}\n'.format(separator).join(agg))
