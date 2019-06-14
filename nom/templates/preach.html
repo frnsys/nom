@@ -10,7 +10,7 @@ body {
 {% endblock %}
 
 {% block content %}
-    <main role="main">
+    <main id="main" role="main">
         <div id="meta">
             <div id="timer"></div>
             <div id="progress"></div>
@@ -30,6 +30,10 @@ body {
             els = [[]],
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
 
+        function timestamp() {
+            return Math.floor(Date.now() / 1000);
+        }
+
         // check if this should show presenter notes
         if (window.location.href.includes('?presenter')) {
             var notes = document.getElementById('notes');
@@ -39,11 +43,11 @@ body {
             meta.style.display = 'block';
 
             var timer = document.getElementById('timer');
-            var elapsed = 0;
+            var start = timestamp();
             var interval = 100;
-            timer.innerText = elapsed;
+            timer.innerText = 0;
             setInterval(() => {
-                elapsed += interval/1000;
+                elapsed = timestamp() - start;
                 let min = Math.floor(elapsed/60);
                 let sec = elapsed % 60;
                 timer.innerText = `${min}:${sec.toFixed(0)}`;
@@ -210,6 +214,13 @@ body {
             document.onkeydown = function(e) {
                 e = e || window.event;
                 switch(e.which || e.keyCode) {
+                    case 70: // f
+                        if (document.fullscreenElement) {
+                            document.exitFullscreen();
+                        } else {
+                            document.getElementById('main').requestFullscreen();
+                        }
+                        break;
                     case 40: // down
                     case 78: // n
                         if (curr_slide < slides.length - 1) {
