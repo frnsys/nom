@@ -23,28 +23,36 @@ body {
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
     <script type="text/javascript">
-        var static = window.location.href.includes('static'),
-            nodes = document.getElementById('note').childNodes,
+        let nodes = document.getElementById('note').childNodes,
+            notes = document.getElementById('notes'),
             out = document.getElementById('presentation'),
             els = [[]],
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
+
+        let params = window.location.search.substr(1).split('&').reduce((acc, param) => {
+            let val = true;
+            if (param.includes('=')) [param, val] = param.split('=');
+            acc[param] = val;
+            return acc;
+        }, {});
 
         function timestamp() {
             return Math.floor(Date.now() / 1000);
         }
 
+        let onSlideChange = () => {};
         // check if this should show presenter notes
-        if (window.location.href.includes('?presenter')) {
-            var notes = document.getElementById('notes');
+        if (params.presenter) {
             notes.style.display = 'block';
 
-            var meta = document.getElementById('meta');
+            let meta = document.getElementById('meta');
             meta.style.display = 'block';
 
-            var timer = document.getElementById('timer');
-            var start = timestamp();
-            var interval = 100;
+            let timer = document.getElementById('timer');
+            let start = timestamp();
+            let interval = 100;
             timer.innerText = 0;
             setInterval(() => {
                 elapsed = timestamp() - start;
@@ -52,26 +60,46 @@ body {
                 let sec = elapsed % 60;
                 timer.innerText = `${min}:${sec.toFixed(0)}`;
             }, interval);
+
+            if (params.key) {
+                const followers = [];
+                let peer = new Peer(params.key);
+                peer.on('connection', (conn) => {
+                    console.log('Received follower');
+                    followers.push(conn);
+                });
+                onSlideChange = (i) => {
+                    followers.forEach((conn) => conn.send(i));
+                };
+            }
+        } else if (params.key){
+            let peer = new Peer();
+            let conn = peer.connect(params.key);
+            conn.on('open', () => {
+                console.log('Connected to leader');
+                conn.on('data', (data) => {
+                    curr_slide = data;
+                    show_slide(curr_slide);
+                });
+            });
         }
 
         function build_slide(elms) {
-            var slide = document.createElement('div');
+            let slide = document.createElement('div');
             slide.className = 'slide';
 
             // to vertically center slide content
-            var slideBody = document.createElement('div');
+            let slideBody = document.createElement('div');
             slideBody.className = 'slide-body';
 
             // to hold actual slide content
-            var slideContent = document.createElement('div');
+            let slideContent = document.createElement('div');
             slideContent.className = 'slide-content';
 
-            for(var j=0; j<elms.length; j++) {
-                slideContent.appendChild(elms[j]);
-            }
+            elms.forEach((el) => slideContent.appendChild(el));
 
             slideBody.appendChild(slideContent);
-            if (slide.getElementsByClassName('background').length > 0) {
+            if (slide.querySelectorAll('.background').length > 0) {
                 slide.className += ' has-background';
             }
 
@@ -81,71 +109,66 @@ body {
         }
 
         function scale_slides() {
-            var slides = document.getElementsByClassName('slide'),
+            let slides = document.querySelectorAll('.slide'),
                 win_width = window.innerWidth,
                 win_height = window.innerHeight;
-            for (var i=0; i<slides.length; i++) {
-                var slide = slides[i],
-                    slide_width = slide.scrollWidth,
+            slides.forEach((slide) => {
+                let slide_width = slide.scrollWidth,
                     slide_height = slide.scrollHeight,
                     scale = Math.min(win_width/slide_width, win_height/slide_height);
                 if (scale < 1) {
-                    var scaled_width = slide_width * scale,
+                    let scaled_width = slide_width * scale,
                         offset = win_width/2 - scaled_width/2;
                     slide.style.transform       = 'translate(' + offset + 'px, 0) scale(' + scale + ')';
                     slide.style.transformOrigin = '0 0';
 
                     // compensate background scaling
-                    var backgrounds = slide.getElementsByClassName('background');
-                    for (var j=0; j < backgrounds.length; j++) {
-                        backgrounds[j].style.transform = 'scale(' + 1/scale + ')';
-                    }
+                    let backgrounds = slide.querySelectorAll('.background');
+                    backgrounds.forEach((bg) => {
+                        bg.style.transform = 'scale(' + 1/scale + ')';
+                    });
                 }
-            }
+            });
         }
-
 
         // Build slides out of the note html, interpreting `hr` as a slide break.
-        for (var i=0; i<nodes.length; i++) {
-            if (nodes[i].nodeName.toLowerCase() == 'hr') {
+        nodes.forEach((node) => {
+            if (node.nodeName.toLowerCase() == 'hr') {
                 els.push([]);
             } else {
-                els[els.length - 1].push(nodes[i]);
+                els[els.length - 1].push(node);
             }
-        }
-        for (var i=0; i<els.length; i++) {
-            var slide = build_slide(els[i]);
+        });
+        els.forEach((el, i) => {
+            let slide = build_slide(el);
             slide.id = 'slide' + i;
-        }
+        });
         document.getElementById('note').style.display = 'none';
 
-        var slides = document.getElementsByClassName('slide');
+        let slides = document.querySelectorAll('.slide');
 
         // setup backgrounds
-        var backgrounds = document.getElementsByClassName('background');
-        for (var i=0; i < backgrounds.length; i++) {
-            if (backgrounds[i].src !== undefined) {
-                backgrounds[i].style.backgroundImage = 'url(' + backgrounds[i].src + ')';
-                backgrounds[i].src = '';
-                backgrounds[i].closest('.slide').appendChild(backgrounds[i]);
+        let backgrounds = document.querySelectorAll('.background');
+        backgrounds.forEach((bg) => {
+            if (bg.src !== undefined) {
+                bg.style.backgroundImage = 'url(' + bg.src + ')';
+                bg.src = '';
+                bg.closest('.slide').appendChild(bg);
             }
-        }
+        });
 
         function show_slide(i) {
-            for (var j=0; j<slides.length; j++) {
-                slides[j].style.visibility = 'hidden';
-                var videos = slides[j].getElementsByTagName('video');
-                for (var k=0; k<videos.length; k++) {
-                    videos[k].pause();
-                    videos[k].currentTime = 0;
-                }
-            }
+            slides.forEach((slide) => {
+                slide.style.visibility = 'hidden';
+                let videos = slide.querySelectorAll('video');
+                videos.forEach((video) => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+            });
             slides[i].style.visibility = 'visible';
-            var videos = slides[i].getElementsByTagName('video');
-            for (var j=0; j<videos.length; j++) {
-                videos[j].play();
-            }
-            let notes = document.getElementById('notes');
+            let videos = slides[i].querySelectorAll('video');
+            videos.forEach((video) => video.play());
             notes.innerHTML = '';
             slides[i].querySelectorAll('.comment').forEach((el) => {
                 let div = document.createElement('div');
@@ -153,25 +176,26 @@ body {
                 notes.appendChild(div);
             });
 
-            var progress = document.getElementById('progress');
+            let progress = document.getElementById('progress');
             progress.innerText = `${i+1}/${slides.length}`;
 
             window.location.hash = i;
+            onSlideChange(i);
         }
 
         function make_static() {
-            var slideBodies = document.getElementsByClassName('slide-body');
-            for (var j=0; j<slides.length; j++) {
-                slides[j].style.visibility = 'visible';
-                slides[j].style.position = 'relative';
-                slides[j].style.transform = '';
-                slideBodies[j].style.position = 'relative';
-            }
+            let slideBodies = document.querySelectorAll('.slide-body');
+            slides.forEach((slide, i) => {
+                slide.style.visibility = 'visible';
+                slide.style.position = 'relative';
+                slide.style.transform = '';
+                slideBodies[i].style.position = 'relative';
+            });
             document.body.style.overflow = 'auto';
         }
 
         window.onload = function() {
-            if (static) {
+            if (params.static) {
                 make_static();
             } else {
                 scale_slides();
@@ -181,16 +205,9 @@ body {
 
         // window.onload doesn't always fire
         // this is a backup
-        setTimeout(function() {
-            if (static) {
-                make_static();
-            } else {
-                scale_slides();
-                show_slide(curr_slide);
-            }
-        }, 5000);
+        setTimeout(() => window.onload(), 5000);
 
-        if (!static) {
+        if (!params.static) {
             window.onresize = scale_slides;
         }
 
@@ -201,16 +218,19 @@ body {
             localStorage.setItem('slide', idx);
         }
 
-        if (!static) {
-            window.addEventListener('storage', function(ev) {
-                if (ev.key === 'slide') {
-                    var idx = parseInt(ev.newValue);
-                    curr_slide = idx;
-                    show_slide(curr_slide);
-                }
-            }, false);
+        if (!params.static) {
+            // If no p2p key set, use local storage
+            if (!params.key) {
+                window.addEventListener('storage', function(ev) {
+                    if (ev.key === 'slide') {
+                        let idx = parseInt(ev.newValue);
+                        curr_slide = idx;
+                        show_slide(curr_slide);
+                    }
+                }, false);
+            }
 
-            // Key navigation.
+            // Key navigation
             document.onkeydown = function(e) {
                 e = e || window.event;
                 switch(e.which || e.keyCode) {
