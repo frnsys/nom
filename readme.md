@@ -77,7 +77,23 @@ First of all, when running a `preach` presentation it's recommended to use the P
 
 You can visit `localhost:8001` in two separate browser tabs and the presentations will be synced. So you can run a copy on one screen and another on the projector.
 
-### Speaker notes
+### Included classes/attributes
+
+There are also some built-in CSS classes for convenience:
+
+- fullscreen iframe: `@[](https://web.site){: .fullscreen}`
+- fullscreen background image: `![](/path/to.jpg){: .background}`
+
+### Presenter mode
+
+Presenter mode can be enabled with a `presenter` query param, e.g. `localhost:8001?presenter`. This mode does the following:
+
+- Shows slide progress
+- Shows a timer
+- Shows speaker notes (see below)
+- Synchronizes slides (see below)
+
+#### Speaker notes
 
 You can also include speaker notes as HTML comments, e.g.:
 
@@ -99,11 +115,14 @@ these are my notes for the second slide.
 
 ```
 
-To view these comments, open up the presentation url with a `notes` query param, e.g. `localhost:8001?notes`.
+#### Slide synchronization
 
-### Included classes/attributes
+Often you will want to have one browser tab with the presenter mode and another with the audience mode. When you advance the presenter mode, the audience mode tab should correspondingly advance too.
 
-There are also some built-in CSS classes for convenience:
+With `preach` there are two ways of synchronizing tabs:
+    - _Local storage_ (default), for browser tabs open on the same device (i.e. computer connected to the projector via a direct connection, e.g. HDMI)
+    - _p2p via WebRTC_, for browser tabs open on separate devices (i.e. laptop with presenter notes, and a separate computer connected to the projector). This requires an internet connection for both devices.
 
-- fullscreen iframe: `@[](https://web.site){: .fullscreen}`
-- fullscreen background image: `![](/path/to.jpg){: .background}`
+To use the p2p method, you must supply an additional `key` query parameter to both the presenter and audience mode tabs:
+1. Open the presenter mode tab with a key of your choosing, e.g. `localhost:8001?presenter&key=foobar`. This tab will be designated the leader for the key `foobar`.
+2. Open the audience mode tab with the same key, e.g. `localhost:8001?key=foobar`. This will follow the designated leader for the key `foobar`.
