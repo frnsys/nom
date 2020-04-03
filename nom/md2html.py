@@ -1,10 +1,16 @@
+"""
+https://python-markdown.github.io/extensions/api/
+"""
+
 import re
 import base64
 import markdown
 import subprocess
-from markdown.util import etree
+from markdown.util import etree, AMP_SUBSTITUTE
 from markdown.extensions import attr_list
-from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
+from markdown.preprocessors import Preprocessor
+from markdown.postprocessors import Postprocessor
+from markdown.inlinepatterns import Pattern, SimpleTagPattern, ImagePattern
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
 AT = attr_list.AttrListTreeprocessor()
@@ -15,9 +21,12 @@ def compile_markdown(md, comments=False):
     extensions = [
         GFM(),
         NomMD(),
+        EmDashExtension(),
         MathJaxExtension(),
+        SortFootnotesExtension(),
         FigureCaptionExtension(),
         InlineGraphvizExtension(),
+        BreakQuotesExtension(),
         'markdown.extensions.footnotes',
         'markdown.extensions.attr_list',
         'markdown.extensions.headerid',
@@ -117,7 +126,6 @@ class MathJaxExtension(markdown.Extension):
 compile html comments into elements,
 for preach presenter notes
 """
-from markdown.postprocessors import Postprocessor
 class CommentProcessor(Postprocessor):
     COMMENTS_RE = re.compile('<!--(((?!-->).)+)-->', re.DOTALL)
     def run(self, text):
@@ -205,7 +213,7 @@ class InlineGraphvizExtension(markdown.Extension):
         md.preprocessors.add('graphviz_block',
                              InlineGraphvizPreprocessor(md), '_begin')
 
-class InlineGraphvizPreprocessor(markdown.preprocessors.Preprocessor):
+class InlineGraphvizPreprocessor(Preprocessor):
     def __init__(self, md):
         super(InlineGraphvizPreprocessor, self).__init__(md)
 
@@ -261,3 +269,80 @@ class InlineGraphvizPreprocessor(markdown.preprocessors.Preprocessor):
             else:
                 break
         return text.split("\n")
+
+
+FOOTNOTE_REF_RE = re.compile('\[\^([A-Za-z0-9]+)\]') # [^id]
+FOOTNOTE_DEF_RE = re.compile('^\[\^([A-Za-z0-9]+)\]:') # [^id]:
+class SortFootnotesProcessor(Preprocessor):
+    """Sort footnote definitions according to footnote
+    reference order. Note that this moves all footnote
+    definitions to the end of the document."""
+    def __init__(self, md):
+        super(SortFootnotesProcessor, self).__init__(md)
+
+    def run(self, lines):
+        new_lines = []
+        refs = []
+        defs = []
+        for line in lines:
+            if FOOTNOTE_DEF_RE.match(line):
+                fn = FOOTNOTE_DEF_RE.match(line).group(1)
+                defs.append((fn, line))
+            else:
+                for fn in FOOTNOTE_REF_RE.findall(line):
+                    refs.append(fn)
+                new_lines.append(line)
+
+        def sort_key(fn_def):
+            fn, _ = fn_def
+            try:
+                return refs.index(fn)
+            except ValueError:
+                return len(refs)
+
+        defs = [line for fn, line in sorted(defs, key=sort_key)]
+        new_lines += defs
+        return new_lines
+
+class SortFootnotesExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.preprocessors.add('sort_footnotes',
+                             SortFootnotesProcessor(md), '_begin')
+
+class BreakQuotesProcessor(Preprocessor):
+    def __init__(self, md):
+        super(BreakQuotesProcessor, self).__init__(md)
+
+    def run(self, lines):
+        # Iterate in overlapping chunks of 3
+        for i in range(len(lines)):
+            try:
+                a, b, c = lines[i:i+3]
+                # If white space between two quotes,
+                # insert some text to force a proper line break
+                if a.startswith('>') and c.startswith('>') and b.strip() == '':
+                    lines[i+1] = '\n<!-- -->'
+            except ValueError:
+                # Less than 3 items
+                pass
+        return lines
+
+class BreakQuotesExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.preprocessors.add('break_quotes',
+                             BreakQuotesProcessor(md), '_begin')
+
+
+# Modified from the `markdown-emdash` package
+class EmDashPattern(Pattern):
+    """Replaces '--' with '&emdash;'."""
+    def __init__(self):
+        super(EmDashPattern, self).__init__('--')
+
+    def handleMatch(self, m):
+        # have to use special AMP_SUBSTITUTE character or it gets escaped
+        return '{}mdash;'.format(AMP_SUBSTITUTE)
+
+class EmDashExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.inlinePatterns.add('emdashpattern', EmDashPattern(), '<not_strong')
