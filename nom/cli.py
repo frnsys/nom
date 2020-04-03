@@ -13,7 +13,8 @@ def cli():
     pass
 
 
-def compile_note(note, outdir, watch=False, view=False, style=None, templ='default', ignore_missing=False, comments=False):
+def compile_note(note, outdir, watch=False, watch_port=9001,
+                 view=False, style=None, templ='default', ignore_missing=False, comments=False):
     note = util.abs_path(note)
     f = partial(compile.compile_note,
                 outdir=outdir,
@@ -26,7 +27,7 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
     if view:
         click.launch(outpath)
     if watch:
-        server = MarkdownServer()
+        server = MarkdownServer(watch_port)
         server.start()
         def handler(note):
             f(note)
@@ -38,8 +39,8 @@ def compile_note(note, outdir, watch=False, view=False, style=None, templ='defau
 
 @cli.command()
 @click.argument('notedir')
-@click.option('-i', '--ignore', is_flag=True, help='ignore missing assets')
-def browse(notedir, ignore):
+@click.option('-i', '--ignore-missing', is_flag=True, help='ignore missing assets')
+def browse(notedir, ignore_missing):
     """browse a note directory in the browser"""
     templ = env.get_template('browser.html')
     for root, dirs, files in os.walk(notedir):
@@ -49,7 +50,7 @@ def browse(notedir, ignore):
         for f in files:
             if not f.endswith('.md'): continue
             notepath = os.path.join(root, f)
-            compile_note(notepath, outdir, view=False, ignore_missing=ignore)
+            compile_note(notepath, outdir, view=False, ignore_missing=ignore_missing)
             index.append(f.replace('.md', ''))
 
         dirs = [d for d in dirs if d != 'assets']
@@ -62,42 +63,37 @@ def browse(notedir, ignore):
 @cli.command()
 @click.argument('note')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
-@click.option('-i', '--ignore', is_flag=True, help='ignore missing assets')
+@click.option('-p', '--watch-port', help='watch server port', default=9001)
+@click.option('-i', '--ignore-missing', is_flag=True, help='ignore missing assets')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
 @click.option('-t', '--templ', help='template to use', default='default')
-def view(note, watch, ignore, style, templ):
+def view(note, **kwargs):
     """view a note in the browser"""
-    compile_note(note, '/tmp', view=True, watch=watch, ignore_missing=ignore, style=style, templ=templ)
+    compile_note(note, '/tmp', view=True, **kwargs)
 
 
 @cli.command()
 @click.argument('note')
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
+@click.option('-p', '--watch-port', help='watch server port', default=9001)
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
-def export(note, outdir, watch, view, style):
+def export(note, outdir, **kwargs):
     """export a note to html"""
-    compile_note(note, outdir, watch=watch, view=view, style=style)
+    compile_note(note, outdir, **kwargs)
 
 
 @cli.command()
 @click.argument('note')
 @click.option('-o', '--outdir', default='/tmp')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
+@click.option('-p', '--watch-port', help='watch server port', default=9001)
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
-@click.option('-S', '--static', is_flag=True, help='compile as static presentation')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
-def preach(note, outdir, watch, view, static, style):
+def preach(note, outdir, **kwargs):
     """export a note to an html presentation"""
-    path = compile_note(note, outdir, watch=watch, view=view, style=style, templ='preach', comments=True)
-    if static:
-        with open(path, 'r') as f:
-            data = f.read()
-        data = data.replace('static = false', 'static = true')
-        print(data)
-        with open(path, 'w') as f:
-            f.write(data)
+    compile_note(note, outdir, templ='preach', comments=True, **kwargs)
 
 
 @cli.command()
