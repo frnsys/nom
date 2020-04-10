@@ -126,3 +126,12 @@ With `preach` there are two ways of synchronizing tabs:
 To use the p2p method, you must supply an additional `key` query parameter to both the presenter and audience mode tabs:
 1. Open the presenter mode tab with a key of your choosing, e.g. `localhost:8001?presenter&key=foobar`. This tab will be designated the leader for the key `foobar`.
 2. Open the audience mode tab with the same key, e.g. `localhost:8001?key=foobar`. This will follow the designated leader for the key `foobar`.
+
+
+#### Troubleshooting
+
+If you run into an error saying that GTK is missing, it may be because you are running `nom` in a virtual environment. You need to install `python3-gi` (e.g. `apt get install python3-gi`) and then symlink that to your virtual environment. For example:
+
+```
+ln -s /usr/lib/python3/dist-packages/gi ~/.pyenv/versions/3.6.6/lib/python3.6/site-packages/
+```
