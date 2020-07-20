@@ -4,6 +4,8 @@ setup(
     name='nom',
     version='1.4.0',
     description='tool for managing markdown notes',
+    package_data={'': ['templates/*']},
+    include_package_data=True,
     url='https://github.com/frnsys/nom',
     author='Francis Tseng',
     author_email='f@frnsys.com',
@@ -21,7 +23,7 @@ setup(
         'watchdog==0.8.3',
         'Pygments==2.1.3',
         'websocket-server==0.4',
-        'requests=2.24.0'
+        'requests==2.24.0'
     ],
     entry_points='''
         [console_scripts]
