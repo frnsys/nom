@@ -160,8 +160,8 @@ Copyright 2013 - [Helder Correia](http://heldercorreia.com) (GPL2)
 """
 from markdown.blockprocessors import BlockProcessor
 from markdown.inlinepatterns import IMAGE_LINK_RE, IMAGE_REFERENCE_RE
-FIGURES = [u'^\s*'+IMAGE_LINK_RE+u'\s*$', u'^\s*'+IMAGE_REFERENCE_RE+u'\s*$'] #is: linestart, any whitespace (even none), image, any whitespace (even none), line ends.
-
+ATTRIBUTE_RE = '\{[-#.a-zA-Z\s]+\}'
+FIGURES = ['^\s*'+IMAGE_LINK_RE+'\s*('+ATTRIBUTE_RE+')?\s*$', '^\s*'+IMAGE_REFERENCE_RE+'\s*('+ATTRIBUTE_RE+')?\s*$'] #is: linestart, any whitespace (even none), image, any whitespace (even none), line ends.
 
 # This is the core part of the extension
 class FigureCaptionProcessor(BlockProcessor):
@@ -179,13 +179,21 @@ class FigureCaptionProcessor(BlockProcessor):
 
     def run(self, parent, blocks): # how to process the block?
         raw_block = blocks.pop(0)
-        captionText = self.FIGURES_RE.search(raw_block).group(1)
+        match = self.FIGURES_RE.search(raw_block)
+        captionText = match.group(1)
 
         # create figure
         figure = etree.SubElement(parent, 'figure')
 
         # render image in figure
         figure.text = raw_block
+
+        attr_match = re.search(ATTRIBUTE_RE, raw_block)
+        if attr_match:
+            attrs = attr_match.group(0)[1:-1].split(' ')
+            classes = [a[1:] for a in attrs if a.startswith('.')]
+            if classes:
+                figure.set('class', ' '.join(classes))
 
         # create caption
         figcaptionElem = etree.SubElement(figure,'figcaption')
