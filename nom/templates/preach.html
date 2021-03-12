@@ -16,6 +16,7 @@ body {
             <div id="progress"></div>
         </div>
         <div id="notes"></div>
+        <div id="counter"></div>
         <div class="note" id="note">
             {{ html }}
         </div>
@@ -179,6 +180,9 @@ body {
             let progress = document.getElementById('progress');
             progress.innerText = `${i+1}/${slides.length}`;
 
+            let counter = document.getElementById('counter');
+            counter.innerText = `${i+1}/${slides.length}`;
+
             window.location.hash = i;
             onSlideChange(i);
         }
@@ -268,7 +272,7 @@ body {
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
-                inlineMath: [["\\","\\"]],
+                inlineMath: [["¦","¦"]],
                 displayMath: [['$$','$$']],
                 processEscapes: true
             }
