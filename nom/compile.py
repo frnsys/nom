@@ -42,7 +42,7 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
             if copy_assets:
                 shutil.copy(from_img_path, to_img_path)
             else:
-                if os.path.exists(to_img_path):
+                if os.path.exists(to_img_path) or os.path.islink(to_img_path):
                     os.remove(to_img_path)
                 os.symlink(from_img_path, to_img_path)
 

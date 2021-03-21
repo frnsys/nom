@@ -338,8 +338,6 @@ tr:nth-child(2n-1) td {
 }
 .gallery figure {
   break-inside: avoid;
-}
-.gallery figcaption {
   margin-bottom: 2em;
 }
 
