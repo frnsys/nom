@@ -47,7 +47,8 @@
 }
 
 html, body {
-  padding: 0 1em;
+  margin: 0;
+  padding: 0;
   font-family: "Liberation Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   line-height: 1.4;
   color: var(--color);
@@ -191,9 +192,14 @@ hr {
   margin: 2em 0;
 }
 .note {
-  max-width: 960px;
   padding: 0 1.5em;
 }
+.note > * {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 iframe {
   display: block;
   margin: 0 auto;
@@ -321,7 +327,8 @@ tr:nth-child(2n-1) td {
 }
 
 .gallery {
-  columns: 2 auto;
+  columns: 3 auto;
+  max-width: none;
 }
 .gallery br {
   display: none;
