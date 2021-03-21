@@ -56,6 +56,27 @@ class VideoPattern(ImagePattern):
         src = m.group(3)
         fig = etree.Element('figure')
         obj = etree.SubElement(fig, 'video')
+        obj.set('controls', 'true')
+        obj.set('src', src)
+
+        attrs = m.group(5)
+        caption = m.group(2)
+        if caption:
+            cap = etree.SubElement(fig, 'figcaption')
+            cap.text = caption
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
+        return fig
+
+
+class AudioPattern(ImagePattern):
+    def handleMatch(self, m):
+        src = m.group(3)
+        fig = etree.Element('figure')
+        obj = etree.SubElement(fig, 'audio')
+        obj.set('controls', 'true')
+
+        obj = etree.SubElement(obj, 'source')
         obj.set('src', src)
 
         attrs = m.group(5)
@@ -88,6 +109,7 @@ class NomMD(markdown.Extension):
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
     PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
     VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
+    AUD_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp3)\)({:([^}]+)})?' # ![...](path/to/something.mp3)
     URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[](http://web.site){: .fullscreen}
 
     def extendMarkdown(self, md, md_globals):
@@ -99,6 +121,9 @@ class NomMD(markdown.Extension):
 
         vid_pattern = VideoPattern(self.VID_RE)
         md.inlinePatterns.add('video_link', vid_pattern, '_begin')
+
+        aud_pattern = AudioPattern(self.AUD_RE)
+        md.inlinePatterns.add('audio_link', aud_pattern, '_begin')
 
         url_pattern = IFramePattern(self.URL_RE)
         md.inlinePatterns.add('iframe_link', url_pattern, '_begin')
