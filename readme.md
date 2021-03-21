@@ -65,7 +65,17 @@ A bit more about each command:
 - embed a pdf: `![](/path/to.pdf)`
 - embed an mp4: `![](/path/to.mp4)`
     - to autoplay an mp4: `![](/path/to.mp4){: autoplay}`
+- embed an mp3: `![](/path/to.mp3)`
 - embed an iframe: `@[](https://web.site)`
+
+A gallery element (target in stylesheet with `.gallery`):
+
+```
++++
+![Image A](assets/foo.jpg)
+![Image B](assets/bar.jpg)
++++
+```
 
 ## `preach`
 

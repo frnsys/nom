@@ -257,7 +257,6 @@ iframe {
 
 figcaption {
   text-align: center;
-  color: rgba(0,0,0,0.5);
 }
 
 /* can't do 100% w/h b/c then
@@ -319,6 +318,22 @@ thead {
 }
 tr:nth-child(2n-1) td {
   background-color: #e9e9e9;
+}
+
+.gallery {
+  columns: 2 auto;
+}
+.gallery br {
+  display: none;
+}
+.gallery p {
+  margin: 0;
+}
+.gallery figure {
+  break-inside: avoid;
+}
+.gallery figcaption {
+  margin-bottom: 2em;
 }
 
 /*

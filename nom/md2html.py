@@ -10,11 +10,11 @@ from markdown.util import etree, AMP_SUBSTITUTE
 from markdown.extensions import attr_list
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
+from markdown.blockprocessors import BlockProcessor
 from markdown.inlinepatterns import Pattern, SimpleTagPattern, ImagePattern
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
 AT = attr_list.AttrListTreeprocessor()
-
 
 def compile_markdown(md, comments=False):
     """compiles markdown to html"""
@@ -24,9 +24,9 @@ def compile_markdown(md, comments=False):
         EmDashExtension(),
         MathJaxExtension(),
         SortFootnotesExtension(),
-        FigureCaptionExtension(),
         InlineGraphvizExtension(),
         BreakQuotesExtension(),
+        GalleryExtension(),
         'markdown.extensions.footnotes',
         'markdown.extensions.attr_list',
         'markdown.extensions.headerid',
@@ -48,6 +48,22 @@ class PDFPattern(ImagePattern):
         a.set('href', src)
         a.text = m.group(2) or src.split('/')[-1]
 
+        return fig
+
+class ImagePattern(ImagePattern):
+    def handleMatch(self, m):
+        src = m.group(3)
+        fig = etree.Element('figure')
+        obj = etree.SubElement(fig, 'img')
+        obj.set('src', src)
+
+        attrs = m.group(5)
+        caption = m.group(2)
+        if caption:
+            cap = etree.SubElement(fig, 'figcaption')
+            cap.text = caption
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
         return fig
 
 
@@ -100,7 +116,6 @@ class IFramePattern(ImagePattern):
             AT.assign_attrs(obj, attrs)
         return obj
 
-
 class NomMD(markdown.Extension):
     """an extension that supports:
     - highlighting with the <mark> tag.
@@ -111,6 +126,7 @@ class NomMD(markdown.Extension):
     VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
     AUD_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp3)\)({:([^}]+)})?' # ![...](path/to/something.mp3)
     URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[](http://web.site){: .fullscreen}
+    IMG_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # ![...](path/to/something.jpg)
 
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
@@ -127,6 +143,9 @@ class NomMD(markdown.Extension):
 
         url_pattern = IFramePattern(self.URL_RE)
         md.inlinePatterns.add('iframe_link', url_pattern, '_begin')
+
+        img_pattern = ImagePattern(self.IMG_RE)
+        md.inlinePatterns.add('image_link', img_pattern, '_end')
 
 
 """
@@ -168,68 +187,29 @@ class CommentExtension(markdown.Extension):
                                 '>raw_html')
 
 
-"""
-The below is from: <https://github.com/jdittrich/figureAltCaption>
-(Not provided as a pypi package, so reproduced here)
+class GalleryProcessor(BlockProcessor):
+    GALLERY_RE = re.compile('\+\+\+(((?!\+\+\+).)+)\+\+\+', re.DOTALL)
+    def test(self, parent, block):
+        return self.GALLERY_RE.match(block)
 
-Generates a Caption for Figures for each Image which stands alone in a paragraph,
-similar to pandoc#s handling of images/figures
-
---------------------------------------------
-
-Licensed under the GPL 2 (see LICENSE.md)
-
-Copyright 2015 - Jan Dittrich by
-building upon the markdown-figures Plugin by
-Copyright 2013 - [Helder Correia](http://heldercorreia.com) (GPL2)
-"""
-from markdown.blockprocessors import BlockProcessor
-from markdown.inlinepatterns import IMAGE_LINK_RE, IMAGE_REFERENCE_RE
-ATTRIBUTE_RE = '\{[-#.a-zA-Z\s]+\}'
-FIGURES = ['^\s*'+IMAGE_LINK_RE+'\s*('+ATTRIBUTE_RE+')?\s*$', '^\s*'+IMAGE_REFERENCE_RE+'\s*('+ATTRIBUTE_RE+')?\s*$'] #is: linestart, any whitespace (even none), image, any whitespace (even none), line ends.
-
-# This is the core part of the extension
-class FigureCaptionProcessor(BlockProcessor):
-    FIGURES_RE = re.compile('|'.join(f for f in FIGURES))
-    def test(self, parent, block): # is the block relevant
-        isImage = bool(self.FIGURES_RE.search(block))
-        isOnlyOneLine = (len(block.splitlines())== 1)
-        isInFigure = (parent.tag == 'figure')
-
-        # print(block, isImage, isOnlyOneLine, isInFigure, "T,T,F")
-        if (isImage and isOnlyOneLine and not isInFigure):
-            return True
-        else:
-            return False
-
-    def run(self, parent, blocks): # how to process the block?
+    def run(self, parent, blocks):
         raw_block = blocks.pop(0)
-        match = self.FIGURES_RE.search(raw_block)
-        captionText = match.group(1)
+        match = self.GALLERY_RE.search(raw_block)
 
-        # create figure
-        figure = etree.SubElement(parent, 'figure')
+        gallery = etree.SubElement(parent, 'div')
+        gallery.set('class', 'gallery')
 
-        # render image in figure
-        figure.text = raw_block
+        # Kind of hacky way to ensure figures are parsed correctly
+        # by converting each line into a separate block
+        contents = '\n\n'.join(match.group(1).split('\n'))
+        print(contents)
+        gallery.text = compile_markdown(contents)
+        print(compile_markdown(contents))
 
-        attr_match = re.search(ATTRIBUTE_RE, raw_block)
-        if attr_match:
-            attrs = attr_match.group(0)[1:-1].split(' ')
-            classes = [a[1:] for a in attrs if a.startswith('.')]
-            if classes:
-                figure.set('class', ' '.join(classes))
-
-        # create caption
-        figcaptionElem = etree.SubElement(figure,'figcaption')
-        figcaptionElem.text = captionText #no clue why the text itself turns out as html again and not raw. Anyhow, it suits me, the blockparsers annoyingly wrapped everything into <p>.
-
-
-class FigureCaptionExtension(markdown.Extension):
+class GalleryExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
-        """ Add an instance of FigcaptionProcessor to BlockParser. """
-        md.parser.blockprocessors.add('figureAltcaption',
-                                      FigureCaptionProcessor(md.parser),
+        md.parser.blockprocessors.add('galleryExtension',
+                                      GalleryProcessor(md.parser),
                                       '<ulist')
 
 
