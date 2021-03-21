@@ -66,12 +66,15 @@ h2 {
   margin-top: 2em;
 }
 main {
-  max-width: 680px;
   margin: 0 auto;
 }
 figure, svg {
   margin: 0 auto;
   display: block;
+}
+audio {
+  border: 1px solid #333;
+  width: 100%;
 }
 video {
   margin: -1em auto 0 auto;
