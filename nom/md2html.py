@@ -202,9 +202,7 @@ class GalleryProcessor(BlockProcessor):
         # Kind of hacky way to ensure figures are parsed correctly
         # by converting each line into a separate block
         contents = '\n\n'.join(match.group(1).split('\n'))
-        print(contents)
         gallery.text = compile_markdown(contents)
-        print(compile_markdown(contents))
 
 class GalleryExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
