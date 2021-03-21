@@ -10,7 +10,7 @@ env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
 
-def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False):
+def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False, copy_assets=False):
     title, _ = os.path.basename(note).rsplit('.', 1)
     content = open(note, 'r').read()
     if templ.endswith('.html'):
@@ -39,7 +39,12 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
         to_img_path = os.path.join(assetsdir, img_name)
         from_img_path = os.path.join(os.path.dirname(note), img_path)
         try:
-            shutil.copy(from_img_path, to_img_path)
+            if copy_assets:
+                shutil.copy(from_img_path, to_img_path)
+            else:
+                if os.path.exists(to_img_path):
+                    os.remove(to_img_path)
+                os.symlink(from_img_path, to_img_path)
 
             # update references to that image in the note
             to_img_path_rel = os.path.relpath(to_img_path, outdir)

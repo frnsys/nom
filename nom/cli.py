@@ -14,7 +14,7 @@ def cli():
 
 
 def compile_note(note, outdir, watch=False, watch_port=9001,
-                 view=False, style=None, templ='default', ignore_missing=False, comments=False):
+                 view=False, style=None, templ='default', ignore_missing=False, comments=False, copy_assets=False):
     note = util.abs_path(note)
     f = partial(compile.compile_note,
                 outdir=outdir,
@@ -22,6 +22,7 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
                 stylesheet=style,
                 ignore_missing=ignore_missing,
                 comments=comments,
+                copy_assets=copy_assets,
                 preview=True)
     outpath = f(note)
     if view:
@@ -40,7 +41,8 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
 @cli.command()
 @click.argument('notedir')
 @click.option('-i', '--ignore-missing', is_flag=True, help='ignore missing assets')
-def browse(notedir, ignore_missing):
+@click.option('-c', '--copy-assets', is_flag=True, help='copy assets instead of symlinking')
+def browse(notedir, ignore_missing, copy_assets):
     """browse a note directory in the browser"""
     templ = env.get_template('browser.html')
     for root, dirs, files in os.walk(notedir):
@@ -50,7 +52,9 @@ def browse(notedir, ignore_missing):
         for f in files:
             if not f.endswith('.md'): continue
             notepath = os.path.join(root, f)
-            compile_note(notepath, outdir, view=False, ignore_missing=ignore_missing)
+            compile_note(notepath, outdir, view=False,
+                    ignore_missing=ignore_missing,
+                    copy_assets=copy_assets)
             index.append(f.replace('.md', ''))
 
         dirs = [d for d in dirs if d != 'assets']
@@ -65,6 +69,7 @@ def browse(notedir, ignore_missing):
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-p', '--watch-port', help='watch server port', default=9001)
 @click.option('-i', '--ignore-missing', is_flag=True, help='ignore missing assets')
+@click.option('-c', '--copy-assets', is_flag=True, help='copy assets instead of symlinking')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
 @click.option('-t', '--templ', help='template to use', default='default')
 def view(note, **kwargs):
@@ -81,7 +86,7 @@ def view(note, **kwargs):
 @click.option('-s', '--style', help='stylesheet to use', default=None)
 def export(note, outdir, **kwargs):
     """export a note to html"""
-    compile_note(note, outdir, **kwargs)
+    compile_note(note, outdir, copy_assets=True, **kwargs)
 
 
 @cli.command()
@@ -91,6 +96,7 @@ def export(note, outdir, **kwargs):
 @click.option('-p', '--watch-port', help='watch server port', default=9001)
 @click.option('-v', '--view', is_flag=True, help='view the note in the browser')
 @click.option('-s', '--style', help='stylesheet to use', default=None)
+@click.option('-c', '--copy-assets', is_flag=True, help='copy assets instead of symlinking')
 def preach(note, outdir, **kwargs):
     """export a note to an html presentation"""
     compile_note(note, outdir, templ='preach', comments=True, **kwargs)
