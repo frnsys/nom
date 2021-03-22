@@ -123,7 +123,7 @@ class NomMD(markdown.Extension):
     """
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
     PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
-    VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp4)\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
+    VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+(mp4|webm))\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
     AUD_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp3)\)({:([^}]+)})?' # ![...](path/to/something.mp3)
     URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[](http://web.site){: .fullscreen}
     IMG_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # ![...](path/to/something.jpg)
