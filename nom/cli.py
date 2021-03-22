@@ -3,7 +3,7 @@ import sys
 import click
 from functools import partial
 from nom import html2md, md2html, parsers, compile, util
-from nom.watch import watch_note
+from nom.watch import watch_notes
 from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
 from nom.compile import env
@@ -33,7 +33,7 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
         def handler(note):
             f(note)
             server.update_clients()
-        watch_note(note, handler)
+        watch_notes([note], handler)
         server.shutdown()
     return outpath
 
@@ -42,8 +42,12 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
 @click.argument('notedir')
 @click.option('-i', '--ignore-missing', is_flag=True, help='ignore missing assets')
 @click.option('-c', '--copy-assets', is_flag=True, help='copy assets instead of symlinking')
-def browse(notedir, ignore_missing, copy_assets):
+@click.option('-w', '--watch', is_flag=True, help='watch the notes for changes')
+@click.option('-p', '--watch-port', help='watch server port', default=9001)
+def browse(notedir, ignore_missing, copy_assets, watch, watch_port):
     """browse a note directory in the browser"""
+    notes = []
+    outdirs = {}
     templ = env.get_template('browser.html')
     for root, dirs, files in os.walk(notedir):
         index = []
@@ -54,14 +58,31 @@ def browse(notedir, ignore_missing, copy_assets):
             notepath = os.path.join(root, f)
             compile_note(notepath, outdir, view=False,
                     ignore_missing=ignore_missing,
-                    copy_assets=copy_assets)
+                    copy_assets=copy_assets,
+                    watch=False) # handle watch here instead
             index.append(f.replace('.md', ''))
+
+            # If we need to watch for changes
+            notes.append(notepath)
+            outdirs[notepath] = outdir
 
         dirs = [d for d in dirs if d != 'assets']
         html = templ.render(notes=index, dirs=dirs)
         with open(os.path.join(outdir, 'index.html'), 'w') as f:
             f.write(html)
+
     click.launch('/tmp/nom/index.html')
+    if watch:
+        server = MarkdownServer(watch_port)
+        server.start()
+        def handler(note):
+            compile_note(note, outdirs[note], view=False,
+                    ignore_missing=ignore_missing,
+                    copy_assets=copy_assets,
+                    watch=False) # handle watch here instead
+            server.update_clients()
+        watch_notes(notes, handler)
+        server.shutdown()
 
 
 @cli.command()

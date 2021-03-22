@@ -5,24 +5,29 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 
-def watch_note(note, handle_func):
-    """watch a single note for changes,
+def watch_notes(notes, handle_func):
+    """watch a notes for changes,
     call `handle_func` on change"""
     ob = Observer()
     handler = FileSystemEventHandler()
-    note_filename = path.basename(note)
+    dirs = set(path.dirname(n) for n in notes)
+    notes = [
+        (n, path.basename(n), path.normpath(util.assets_dir(n)))
+        for n in notes]
 
     def handle_event(event):
         _, filename = path.split(event.src_path)
-        if note_filename == filename or \
-                path.normpath(event.src_path) == path.normpath(util.assets_dir(note)):
-            print('compiling...')
+        src_path = path.normpath(event.src_path)
+        note = next((n[0] for n in notes if n[1] == filename or n[2] == src_path), None)
+        if note is not None:
+            print('compiling {}'.format(note))
             handle_func(note)
             print('done')
     handler.on_any_event = handle_event
 
-    print('watching "{0}"...'.format(note_filename))
-    ob.schedule(handler, path.dirname(note), recursive=True)
+    print('watching')
+    for d in dirs:
+        ob.schedule(handler, d, recursive=True)
     ob.start()
 
     try:
