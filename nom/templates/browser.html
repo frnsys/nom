@@ -1,20 +1,50 @@
 {% extends 'layout.html' %}
 
-{% block content %}
-    <main role="main" id="index">
-        <ul>
-            {% for note in notes %}
-                <li><a href="{{ note }}/index.html">{{ note }}</a></li>
-            {% endfor %}
-        </ul>
-        {% if dirs %}
-            <h2>subdirs</h2>
-            <ul>
-            {% for dir in dirs %}
-                <li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    </main>
-{% endblock %}
+{% macro render_dir(dir) -%}
+    <ul>
+        {% for note, path in dir.notes %}
+            <li><a class="{% if path == current %}current{% endif %}" href="{{ path }}/index.html">{{ note }}</a></li>
+        {% endfor %}
+        {% for subdir, path in dir.dirs %}
+            <li>
+                <a class="{% if path == current %}current{% endif %}" href="{{ path }}/index.html">{{ subdir }}</a>
+                {% if tree[subdir] %}
+                    {{ render_dir(tree[subdir]) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{%- endmacro %}
 
+{% block content %}
+    <main id="browse-note" role="main">
+        <div id="browse-note-index">
+            {{ render_dir(tree['.']) }}
+        </div>
+        <div class="note" id="note">
+            {{ html }}
+        </div>
+    </main>
+
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [["¦","¦"]],
+                displayMath: [['$$','$$']],
+                processEscapes: true
+            }
+        });
+    </script>
+    {% if preview %}
+    <script>
+        // Connect to Web Socket
+        var ws = new WebSocket("ws://localhost:9001/");
+        ws.onmessage = function(e) {
+            if (e.data === 'update') {
+                window.location.reload();
+            }
+        };
+    </script>
+    {% endif %}
+{% endblock %}

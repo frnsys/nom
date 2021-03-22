@@ -151,11 +151,36 @@ li figure > img {
 #notes a {
   color: #fff;
 }
+
 #index {
   max-width: 320px;
 }
 #index ul {
   padding: 0;
+}
+
+#browse-note {
+  display: flex;
+}
+#browse-note #note {
+  flex: 1;
+}
+#browse-note-index {
+  height: 100vh;
+  border-right: 1px solid #333;
+  top: 0;
+  position: sticky;
+  align-self: flex-start
+}
+#browse-note-index ul {
+  padding: 0 1em;
+  list-style-type: none;
+}
+#browse-note-index a {
+  text-decoration: none;
+}
+#browse-note-index a.current {
+  color: var(--accent-hover-color);
 }
 
 #meta {

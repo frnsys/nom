@@ -14,7 +14,7 @@ def cli():
 
 
 def compile_note(note, outdir, watch=False, watch_port=9001,
-                 view=False, style=None, templ='default', ignore_missing=False, comments=False, copy_assets=False):
+                 view=False, style=None, templ='default', ignore_missing=False, comments=False, copy_assets=False, templ_data=None):
     note = util.abs_path(note)
     f = partial(compile.compile_note,
                 outdir=outdir,
@@ -23,6 +23,7 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
                 ignore_missing=ignore_missing,
                 comments=comments,
                 copy_assets=copy_assets,
+                templ_data=templ_data,
                 preview=True)
     outpath = f(note)
     if view:
@@ -46,44 +47,67 @@ def compile_note(note, outdir, watch=False, watch_port=9001,
 @click.option('-p', '--watch-port', help='watch server port', default=9001)
 def browse(notedir, ignore_missing, copy_assets, watch, watch_port):
     """browse a note directory in the browser"""
+    tree = {}
     notes = []
     outdirs = {}
+    outputdir = os.path.join('/tmp', 'nom')
     templ = env.get_template('browser.html')
     for root, dirs, files in os.walk(notedir):
         index = []
-        outdir = os.path.join('/tmp', 'nom', root)
+        outdir = os.path.join(outputdir, root)
         os.makedirs(outdir, exist_ok=True)
         for f in files:
             if not f.endswith('.md'): continue
             notepath = os.path.join(root, f)
-            compile_note(notepath, outdir, view=False,
-                    ignore_missing=ignore_missing,
-                    copy_assets=copy_assets,
-                    watch=False) # handle watch here instead
-            index.append(f.replace('.md', ''))
-
-            # If we need to watch for changes
             notes.append(notepath)
             outdirs[notepath] = outdir
+            index.append(f.replace('.md', ''))
 
-        dirs = [d for d in dirs if d != 'assets']
-        html = templ.render(notes=index, dirs=dirs)
+        # If we found notes, compile an index page for this folder
+        if index:
+            dirs = [d for d in dirs if d != 'assets']
 
-        styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
+            # Track the whole tree of notes so we can render tree indices
+            tree[os.path.relpath(root)] = {
+                'notes': [
+                    (n, os.path.normpath(os.path.join(outdir, n)))
+                        for n in index],
+                'dirs': [
+                    (d, os.path.normpath(os.path.join(outdir, d)))
+                        for d in dirs]
+            }
+
+    # Initial compile
+    styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
+    for dir in tree.keys():
+        outdir = os.path.join(outputdir, dir)
+        html = templ.render(tree=tree, current=outdir)
         with open(os.path.join(outdir, 'index.html'), 'w') as f:
             f.write(html)
         with open(os.path.join(outdir, 'style.css'), 'w') as f:
             f.write(styles)
+    for note in notes:
+        outpath = os.path.normpath(os.path.join(outputdir, note)).replace('.md', '')
+        compile_note(note, outdirs[note], view=False,
+                templ='browser',
+                ignore_missing=ignore_missing,
+                copy_assets=copy_assets,
+                templ_data={'tree': tree, 'current': outpath},
+                watch=False)
 
     click.launch('/tmp/nom/index.html')
+
     if watch:
         server = MarkdownServer(watch_port)
         server.start()
         def handler(note):
+            outpath = os.path.normpath(os.path.join(outputdir, note)).replace('.md', '')
             compile_note(note, outdirs[note], view=False,
+                    templ='browser',
                     ignore_missing=ignore_missing,
                     copy_assets=copy_assets,
-                    watch=False) # handle watch here instead
+                    templ_data={'tree': tree, 'current': outpath},
+                    watch=False)
             server.update_clients()
         watch_notes(notes, handler)
         server.shutdown()

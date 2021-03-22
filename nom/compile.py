@@ -10,7 +10,7 @@ env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
 
-def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False, copy_assets=False):
+def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=False, comments=False, preview=False, copy_assets=False, templ_data=None):
     title, _ = os.path.basename(note).rsplit('.', 1)
     content = open(note, 'r').read()
     if templ.endswith('.html'):
@@ -66,8 +66,9 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
         f.write(styles)
 
     # render
+    templ_data = templ_data or {}
     html = md2html.compile_markdown(content, comments=comments)
-    content = templ.render(html=html, title=title, preview=preview)
+    content = templ.render(html=html, title=title, preview=preview, **templ_data)
 
     # save it
     outpath = os.path.join(outdir, 'index.html')
