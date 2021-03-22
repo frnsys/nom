@@ -332,6 +332,7 @@ tr:nth-child(2n-1) td {
 .gallery {
   columns: 3 auto;
   max-width: none;
+  margin: 2em auto;
 }
 .gallery br {
   display: none;
