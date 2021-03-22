@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <main role="main">
+    <main role="main" id="index">
         <ul>
             {% for note in notes %}
                 <li><a href="{{ note }}/index.html">{{ note }}</a></li>

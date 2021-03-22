@@ -151,6 +151,12 @@ li figure > img {
 #notes a {
   color: #fff;
 }
+#index {
+  max-width: 320px;
+}
+#index ul {
+  padding: 0;
+}
 
 #meta {
   display: none;

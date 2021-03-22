@@ -6,7 +6,7 @@ from nom import html2md, md2html, parsers, compile, util
 from nom.watch import watch_notes
 from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
-from nom.compile import env
+from nom.compile import env, templ_dir
 
 @click.group()
 def cli():
@@ -68,8 +68,12 @@ def browse(notedir, ignore_missing, copy_assets, watch, watch_port):
 
         dirs = [d for d in dirs if d != 'assets']
         html = templ.render(notes=index, dirs=dirs)
+
+        styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
         with open(os.path.join(outdir, 'index.html'), 'w') as f:
             f.write(html)
+        with open(os.path.join(outdir, 'style.css'), 'w') as f:
+            f.write(styles)
 
     click.launch('/tmp/nom/index.html')
     if watch:
