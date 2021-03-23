@@ -152,9 +152,18 @@ body {
         let backgrounds = document.querySelectorAll('.background');
         backgrounds.forEach((bg) => {
             if (bg.src !== undefined) {
+                let figure = bg.closest('figure');
+                let caption = figure.querySelector('figcaption');
                 bg.style.backgroundImage = 'url(' + bg.src + ')';
                 bg.src = '';
                 bg.closest('.slide').appendChild(bg);
+                if (caption) {
+                    let bgCaption = document.createElement('div');
+                    bgCaption.classList.add('background-caption');
+                    bgCaption.innerHTML = caption.innerHTML;
+                    bg.closest('.slide').appendChild(bgCaption);
+                }
+                figure.parentNode.removeChild(figure);
             }
         });
 
@@ -278,5 +287,16 @@ body {
             }
         });
     </script>
-{% endblock %}
 
+    {% if preview %}
+    <script>
+        // Connect to Web Socket
+        var ws = new WebSocket("ws://localhost:9001/");
+        ws.onmessage = function(e) {
+            if (e.data === 'update') {
+                window.location.reload();
+            }
+        };
+    </script>
+    {% endif %}
+{% endblock %}

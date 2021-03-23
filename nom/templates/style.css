@@ -118,11 +118,13 @@ li figure > img {
   position: absolute;
   /* top: 50%; */
   /* transform: translateY(-50%); */
+  height: 100vh;
   width: 100%;
   /* TODO */
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 1;
 }
 .slide-content {
   padding: 2em;
@@ -258,8 +260,13 @@ iframe {
   z-index: 0;
   background-size: cover;
   background-position: center center;
-  width: 100%;
-  height: 100vh;
+  border: none;
+  pointer-events: none;
+
+  /* hack to get rid of empty img borders */
+  width: 0;
+  height: 0;
+  padding: 50vh 50vw;
 }
 
 .background-caption {
@@ -267,20 +274,10 @@ iframe {
   color: #fff;
   background: rgba(0,0,0,0.8);
   max-width: 50%;
-  top: 0;
+  bottom: 1em;
   left: 1em;
   z-index: 2;
-  padding: 1em;
-}
-
-.background-attribution {
-  position: absolute;
-  bottom: 0.5em;
-  right: 0.5em;
-  color: #777;
-  background: #fff;
-  max-width: 50%;
-  font-size: 0.5em;
+  padding: 0.5em;
 }
 
 .background-video {
@@ -423,12 +420,21 @@ tr:nth-child(2n-1) td {
   color: var(--code-string);
 }
 
+@media only screen and (max-width: 980px) {
+  .gallery {
+    columns: 2 auto;
+  }
+}
+
 @media only screen and (max-width: 720px) {
   html, body {
     padding: 0;
   }
   .slide-content {
     padding: 0;
+  }
+  .gallery {
+    columns: 1 auto;
   }
 }
 
