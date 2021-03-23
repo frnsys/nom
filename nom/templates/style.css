@@ -69,7 +69,7 @@ main {
   margin: 0 auto;
 }
 figure, svg {
-  margin: 0 auto;
+  margin: 2em auto;
   display: block;
 }
 audio {
@@ -88,8 +88,9 @@ img {
   display: inline;
   border: 1px solid var(--media-border-color);
 }
-figure > img {
+figure > img, figure > a img {
   display: block;
+  margin: 0 auto;
 }
 li figure {
   display: inline-block;
@@ -373,6 +374,7 @@ tr:nth-child(2n-1) td {
 }
 .gallery figure {
   break-inside: avoid;
+  margin-top: 0;
   margin-bottom: 2em;
 }
 

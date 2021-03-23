@@ -54,7 +54,9 @@ class ImagePattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
         fig = etree.Element('figure')
-        obj = etree.SubElement(fig, 'img')
+        link = etree.SubElement(fig, 'a')
+        link.set('href', src)
+        obj = etree.SubElement(link, 'img')
         obj.set('src', src)
 
         attrs = m.group(5)
