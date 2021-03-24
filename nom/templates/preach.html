@@ -114,14 +114,15 @@ body {
                 win_width = window.innerWidth,
                 win_height = window.innerHeight;
             slides.forEach((slide) => {
-                let slide_width = slide.scrollWidth,
-                    slide_height = slide.scrollHeight,
+                // Reset transform, otherwise offests include scale
+                slide.style.transform = '';
+                let content = slide.querySelector('.slide-content');
+                let slide_width = content.offsetWidth,
+                    slide_height = content.offsetHeight,
                     scale = Math.min(win_width/slide_width, win_height/slide_height);
                 if (scale < 1) {
-                    let scaled_width = slide_width * scale,
-                        offset = win_width/2 - scaled_width/2;
-                    slide.style.transform       = 'translate(' + offset + 'px, 0) scale(' + scale + ')';
-                    slide.style.transformOrigin = '0 0';
+                    slide.style.transform       = `scale(${scale})`;
+                    slide.style.transformOrigin = '50% 50%';
 
                     // compensate background scaling
                     let backgrounds = slide.querySelectorAll('.background');
@@ -142,7 +143,7 @@ body {
         });
         els.forEach((el, i) => {
             let slide = build_slide(el);
-            slide.id = 'slide' + i;
+            slide.id = `slide-${i}`;
         });
         document.getElementById('note').style.display = 'none';
 
