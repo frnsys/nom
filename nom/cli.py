@@ -78,7 +78,7 @@ def browse(notedir, ignore_missing, copy_assets, watch, watch_port):
             }
 
     # Initial compile
-    styles = open(os.path.join(static_dir, 'style.css'), 'r').read()
+    styles = open(os.path.join(static_dir, 'css/style.css'), 'r').read()
     for dir in tree.keys():
         outdir = os.path.join(outputdir, dir)
         html = templ.render(tree=tree, current=outdir)
