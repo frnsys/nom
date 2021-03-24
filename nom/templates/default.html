@@ -6,26 +6,4 @@
             {{ html }}
         </div>
     </main>
-
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [["¦","¦"]],
-                displayMath: [['$$','$$']],
-                processEscapes: true
-            }
-        });
-    </script>
-    {% if preview %}
-    <script>
-        // Connect to Web Socket
-        var ws = new WebSocket("ws://localhost:9001/");
-        ws.onmessage = function(e) {
-            if (e.data === 'update') {
-                window.location.reload();
-            }
-        };
-    </script>
-    {% endif %}
 {% endblock %}

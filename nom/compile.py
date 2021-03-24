@@ -6,6 +6,7 @@ from jinja2 import FileSystemLoader, environment
 
 dir = os.path.dirname(os.path.abspath(__file__))
 templ_dir = os.path.join(dir, 'templates')
+static_dir = os.path.join(dir, 'static')
 env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
@@ -55,15 +56,30 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
             print('Couldn\'t find `{}`, ignoring'.format(from_img_path))
 
     # default styles
-    styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
+    css_dir = os.path.join(static_dir, 'css')
+    css = [open(os.path.join(css_dir, f), 'r').read() for f in os.listdir(css_dir)]
 
     # if a stylesheet was specified, copy it over
     if stylesheet is not None:
-        styles = '\n'.join([styles, open(stylesheet, 'r').read()])
+        css.append(open(stylesheet, 'r').read())
 
     # write the stylesheet
     with open(os.path.join(outdir, 'style.css'), 'w') as f:
-        f.write(styles)
+        f.write('\n'.join(css))
+
+    # default fonts (mostly for katex/math)
+    fonts_dir = os.path.join(static_dir, 'fonts')
+    out_fonts_dir = os.path.join(outdir, 'fonts')
+    if not os.path.exists(out_fonts_dir):
+        os.makedirs(out_fonts_dir)
+    for f in os.listdir(fonts_dir):
+        shutil.copy(os.path.join(fonts_dir, f), os.path.join(out_fonts_dir, f))
+
+    # default javascript
+    js_dir = os.path.join(static_dir, 'js')
+    js = [open(os.path.join(js_dir, f), 'r').read() for f in os.listdir(js_dir)]
+    with open(os.path.join(outdir, 'main.js'), 'w') as f:
+        f.write('\n'.join(js))
 
     # render
     templ_data = templ_data or {}

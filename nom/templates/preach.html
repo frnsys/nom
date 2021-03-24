@@ -15,7 +15,7 @@ body {
             <div id="timer"></div>
             <div id="progress"></div>
         </div>
-        <div id="notes"></div>
+        <div id="presenter-notes"></div>
         <div id="counter"></div>
         <div class="note" id="note">
             {{ html }}
@@ -27,7 +27,7 @@ body {
     <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
     <script type="text/javascript">
         let nodes = document.getElementById('note').childNodes,
-            notes = document.getElementById('notes'),
+            notes = document.getElementById('presenter-notes'),
             out = document.getElementById('presentation'),
             els = [[]],
             curr_slide = window.location.hash ? parseInt(window.location.hash.substr(1)) : 0;
@@ -277,27 +277,4 @@ body {
             }
         }
     </script>
-
-    <script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [["¦","¦"]],
-                displayMath: [['$$','$$']],
-                processEscapes: true
-            }
-        });
-    </script>
-
-    {% if preview %}
-    <script>
-        // Connect to Web Socket
-        var ws = new WebSocket("ws://localhost:9001/");
-        ws.onmessage = function(e) {
-            if (e.data === 'update') {
-                window.location.reload();
-            }
-        };
-    </script>
-    {% endif %}
 {% endblock %}

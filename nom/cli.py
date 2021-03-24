@@ -6,7 +6,7 @@ from nom import html2md, md2html, parsers, compile, util
 from nom.watch import watch_notes
 from nom.server import MarkdownServer
 from nom.clipboard import get_clipboard_html
-from nom.compile import env, templ_dir
+from nom.compile import env, static_dir
 
 @click.group()
 def cli():
@@ -78,7 +78,7 @@ def browse(notedir, ignore_missing, copy_assets, watch, watch_port):
             }
 
     # Initial compile
-    styles = open(os.path.join(templ_dir, 'style.css'), 'r').read()
+    styles = open(os.path.join(static_dir, 'style.css'), 'r').read()
     for dir in tree.keys():
         outdir = os.path.join(outputdir, dir)
         html = templ.render(tree=tree, current=outdir)
