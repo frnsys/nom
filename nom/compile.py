@@ -1,8 +1,10 @@
+import re
 import os
 import shutil
 from nom import md2html, parsers
 from jinja2 import FileSystemLoader, environment
 
+MATH_RE = re.compile('(^\$\$|¦)', re.M)
 
 dir = os.path.dirname(os.path.abspath(__file__))
 templ_dir = os.path.join(dir, 'templates')
@@ -67,13 +69,15 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
     with open(os.path.join(outdir, 'style.css'), 'w') as f:
         f.write('\n'.join(css))
 
-    # default fonts (mostly for katex/math)
-    fonts_dir = os.path.join(static_dir, 'fonts')
-    out_fonts_dir = os.path.join(outdir, 'fonts')
-    if not os.path.exists(out_fonts_dir):
-        os.makedirs(out_fonts_dir)
-    for f in os.listdir(fonts_dir):
-        shutil.copy(os.path.join(fonts_dir, f), os.path.join(out_fonts_dir, f))
+    # fonts for katex/math
+    include_math = MATH_RE.search(content)
+    if include_math:
+        fonts_dir = os.path.join(static_dir, 'fonts')
+        out_fonts_dir = os.path.join(outdir, 'fonts')
+        if not os.path.exists(out_fonts_dir):
+            os.makedirs(out_fonts_dir)
+        for f in os.listdir(fonts_dir):
+            shutil.copy(os.path.join(fonts_dir, f), os.path.join(out_fonts_dir, f))
 
     # default javascript
     js_dir = os.path.join(static_dir, 'js')
