@@ -60,12 +60,13 @@ class ImagePattern(ImagePattern):
         obj.set('src', src)
 
         attrs = m.group(5)
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
+
         caption = m.group(2)
         if caption:
             cap = etree.SubElement(fig, 'figcaption')
             cap.text = caption
-        if attrs is not None:
-            AT.assign_attrs(obj, attrs)
         return fig
 
 
@@ -78,12 +79,13 @@ class VideoPattern(ImagePattern):
         obj.set('src', src)
 
         attrs = m.group(5)
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
+
         caption = m.group(2)
         if caption:
             cap = etree.SubElement(fig, 'figcaption')
             cap.text = caption
-        if attrs is not None:
-            AT.assign_attrs(obj, attrs)
         return fig
 
 
@@ -98,25 +100,40 @@ class AudioPattern(ImagePattern):
         obj.set('src', src)
 
         attrs = m.group(5)
+        if attrs is not None:
+            AT.assign_attrs(obj, attrs)
+
         caption = m.group(2)
         if caption:
             cap = etree.SubElement(fig, 'figcaption')
             cap.text = caption
-        if attrs is not None:
-            AT.assign_attrs(obj, attrs)
         return fig
 
 
 class IFramePattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
-        obj = etree.Element('iframe')
+        fig = etree.Element('figure')
+
+        obj = etree.SubElement(fig, 'iframe')
         obj.set('src', src)
+        obj.set('frameborder', '0')
+        obj.set('allowfullscreen', 'true')
+        obj.set('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture')
 
         attrs = m.group(5)
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
-        return obj
+
+        caption = m.group(2)
+        if caption:
+            fig.set('class', 'has-iframe has-caption')
+            cap = etree.SubElement(fig, 'figcaption')
+            cap.text = caption
+        else:
+            fig.set('class', 'has-iframe')
+        return fig
+
 
 class NomMD(markdown.Extension):
     """an extension that supports:
@@ -127,7 +144,7 @@ class NomMD(markdown.Extension):
     PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:<\/.*>)?`?\)' # ![...](path/to/something.pdf)
     VID_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+(mp4|webm))\)({:([^}]+)})?' # ![...](path/to/something.mp4){: autoplay}
     AUD_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+mp3)\)({:([^}]+)})?' # ![...](path/to/something.mp3)
-    URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[](http://web.site){: .fullscreen}
+    URL_RE = r'@\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # @[...](http://web.site)
     IMG_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+)\)({:([^}]+)})?' # ![...](path/to/something.jpg)
 
     def extendMarkdown(self, md, md_globals):
