@@ -59,7 +59,7 @@ body {
                 elapsed = timestamp() - start;
                 let min = Math.floor(elapsed/60);
                 let sec = elapsed % 60;
-                timer.innerText = `${min}:${sec.toFixed(0)}`;
+                timer.innerText = `${min}:${sec.toFixed(0).padStart(2, '0')}`;
             }, interval);
 
             if (params.key) {
