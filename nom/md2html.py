@@ -59,7 +59,7 @@ class ImagePattern(ImagePattern):
         obj = etree.SubElement(link, 'img')
         obj.set('src', src)
 
-        attrs = m.group(5)
+        attrs = m.group(6)
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
 
@@ -78,7 +78,7 @@ class VideoPattern(ImagePattern):
         obj.set('controls', 'true')
         obj.set('src', src)
 
-        attrs = m.group(5)
+        attrs = m.group(6)
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
 
@@ -99,7 +99,7 @@ class AudioPattern(ImagePattern):
         obj = etree.SubElement(obj, 'source')
         obj.set('src', src)
 
-        attrs = m.group(5)
+        attrs = m.group(6)
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
 
@@ -121,7 +121,7 @@ class IFramePattern(ImagePattern):
         obj.set('allowfullscreen', 'true')
         obj.set('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture')
 
-        attrs = m.group(5)
+        attrs = m.group(6)
         if attrs is not None:
             AT.assign_attrs(obj, attrs)
 
