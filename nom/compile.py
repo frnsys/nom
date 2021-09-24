@@ -69,21 +69,19 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
     with open(os.path.join(outdir, 'style.css'), 'w') as f:
         f.write('\n'.join(css))
 
-    # fonts for katex/math
-    include_math = MATH_RE.search(content)
-    if include_math:
-        fonts_dir = os.path.join(static_dir, 'fonts')
-        out_fonts_dir = os.path.join(outdir, 'fonts')
-        if not os.path.exists(out_fonts_dir):
-            os.makedirs(out_fonts_dir)
-        for f in os.listdir(fonts_dir):
-            shutil.copy(os.path.join(fonts_dir, f), os.path.join(out_fonts_dir, f))
-
     # default javascript
     js_dir = os.path.join(static_dir, 'js')
     js = [open(os.path.join(js_dir, f), 'r').read() for f in os.listdir(js_dir)]
     with open(os.path.join(outdir, 'main.js'), 'w') as f:
         f.write('\n'.join(js))
+
+    # symlink mathjax
+    include_math = MATH_RE.search(content)
+    if include_math:
+        to_mathjax = os.path.join(outdir, 'mathjax')
+        if os.path.exists(to_mathjax) or os.path.islink(to_mathjax):
+            os.remove(to_mathjax)
+        os.symlink(os.path.join(static_dir, 'mathjax'), to_mathjax)
 
     # render
     templ_data = templ_data or {}

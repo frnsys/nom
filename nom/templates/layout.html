@@ -16,15 +16,14 @@
 
     <script src="main.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                  {left: "$$", right: "$$", display: true},
-                  {left: "¦", right: "¦", display: false},
-                ]
-            });
-        });
+    MathJax = {
+      tex: {
+        inlineMath: [['¦', '¦']],
+        displayMath: [['$$','$$']]
+      }
+    };
     </script>
+    <script src="mathjax/tex-chtml.js" id="MathJax-script" async></script>
 
     {% if preview %}
     <script>
