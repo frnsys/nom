@@ -136,3 +136,14 @@ With `preach` there are two ways of synchronizing tabs:
 To use the p2p method, you must supply an additional `key` query parameter to both the presenter and audience mode tabs:
 1. Open the presenter mode tab with a key of your choosing, e.g. `localhost:8001?presenter&key=foobar`. This tab will be designated the leader for the key `foobar`.
 2. Open the audience mode tab with the same key, e.g. `localhost:8001?key=foobar`. This will follow the designated leader for the key `foobar`.
+
+## Dev notes
+
+The MathJax installed here is version 3.2.0. It's faster than 2.0 but lacking some features--most important newline (`\\`) support (see <https://github.com/mathjax/MathJax/issues/2312>). According to that issue it should be implemented some time next year.
+
+To get the latest version of MathJax:
+
+```
+git clone https://github.com/mathjax/MathJax.git /tmp/mathjax
+mv /tmp/mathjax nom/static/mathjax
+```
