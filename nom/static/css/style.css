@@ -181,7 +181,8 @@ li figure > img {
   border-right: 1px solid #333;
   top: 0;
   position: sticky;
-  align-self: flex-start
+  align-self: flex-start;
+  overflow-y: auto;
 }
 #browse-note-index ul {
   padding: 0 1em;

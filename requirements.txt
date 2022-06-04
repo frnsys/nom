@@ -1,5 +1,5 @@
-Jinja2==2.8
-Markdown==3.3.4
+Jinja2==2.11.3
+Markdown==2.6.11
 click==6.2
 gfm==0.0.3
 html2text==2015.11.4

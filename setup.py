@@ -13,8 +13,8 @@ setup(
 
     packages=['nom'],
     install_requires=[
-        'Jinja2==2.8',
-        'Markdown==2.6.5',
+        'Jinja2==2.11.3',
+        'Markdown==2.6.11',
         'click==6.2',
         'gfm==0.0.3',
         'lxml==4.5.2',
