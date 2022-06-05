@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='nom',
-    version='1.5.0',
+    version='1.5.1',
     description='tool for managing markdown notes',
     package_data={'': ['templates/*']},
     include_package_data=True,
