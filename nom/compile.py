@@ -1,14 +1,15 @@
 import re
 import os
 import shutil
+import lxml.html
 from nom import md2html, parsers
 from jinja2 import FileSystemLoader, environment
 
 MATH_RE = re.compile('(^\$\$|¦)', re.M)
 
-dir = os.path.dirname(os.path.abspath(__file__))
-templ_dir = os.path.join(dir, 'templates')
-static_dir = os.path.join(dir, 'static')
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+templ_dir = os.path.join(cur_dir, 'templates')
+static_dir = os.path.join(cur_dir, 'static')
 env = environment.Environment()
 env.loader = FileSystemLoader(templ_dir)
 
@@ -86,7 +87,9 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
     # render
     templ_data = templ_data or {}
     html = md2html.compile_markdown(content, comments=comments)
-    content = templ.render(html=html, title=title, preview=preview, **templ_data)
+    headers = lxml.html.fromstring(html).cssselect('h1')
+    toc = [(h.attrib['id'], h.text_content()) for h in headers]
+    content = templ.render(html=html, title=title, preview=preview, toc=toc, **templ_data)
 
     # save it
     outpath = os.path.join(outdir, 'index.html')

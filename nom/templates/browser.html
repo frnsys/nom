@@ -21,6 +21,11 @@
         <div id="browse-note-index">
             {{ render_dir(tree['.']) }}
         </div>
+        <div id="note-toc">
+            {% for id, text in toc %}
+                <a href="#{{id}}">{{text}}</a>
+            {% endfor %}
+        </div>
         <div class="note" id="note">
             {{ html }}
         </div>

@@ -15,7 +15,7 @@ setup(
     install_requires=[
         'Jinja2==3.1.2',
         'Markdown==2.6.11',
-        'click==6.2',
+        'click>=6.2',
         'gfm==0.0.3',
         'lxml==4.9.0',
         'html2text==2015.11.4',
@@ -23,7 +23,7 @@ setup(
         'watchdog==2.1.8',
         'Pygments==2.1.3',
         'websocket-server==0.4',
-        'requests==2.24.0'
+        'requests>=2.24.0'
     ],
     entry_points='''
         [console_scripts]

@@ -246,6 +246,36 @@ hr {
   margin-right: auto;
 }
 
+#note-toc {
+  position: fixed;
+  max-width: 320px;
+  right: 1em;
+  top: 1em;
+  border: 1px solid #333;
+  padding: 0.5em;
+  font-size: 0.7em;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 20px;
+  height: 20px;
+  background: #9a9a9a;
+  z-index: 10;
+}
+#note-toc:hover {
+  width: auto;
+  height: auto;
+  background: #181818;
+}
+#note-toc a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  margin: 0.5em;
+}
+#note-toc a:hover {
+  color: var(--accent-color);
+}
+
 iframe {
   display: block;
   margin: 0 auto;
