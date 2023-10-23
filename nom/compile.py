@@ -2,7 +2,7 @@ import re
 import os
 import shutil
 import lxml.html
-from nom import md2html, parsers
+from nom import md2html, parsers, util
 from jinja2 import FileSystemLoader, environment
 
 MATH_RE = re.compile('(^\$\$|¦)', re.M)
@@ -40,7 +40,9 @@ def compile_note(note, outdir, stylesheet=None, templ='default', ignore_missing=
 
         # copy img to compiled assets directory
         _, img_name = os.path.split(img_path)
-        to_img_path = os.path.join(assetsdir, img_name)
+        _, ext = os.path.splitext(img_path)
+        img_hash = util.get_file_hash(img_path)
+        to_img_path = os.path.join(assetsdir, "{}{}".format(img_hash, ext))
         from_img_path = os.path.join(os.path.dirname(note), img_path)
         try:
             if copy_assets:
